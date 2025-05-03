@@ -1,0 +1,19 @@
+
+
+
+
+
+
+I want to create a streamlit app call app.py that gets all necessary inputs from a user and then makes a call to an LLM and then saves the response from the LLM.
+
+Inputs:
+
+prompt, to be selected from the prompts folder
+a text file containing urls, to be uploaded from anywhere on the user's computer
+an LLM selection, offered through Bedrock, with the options to come from the selected_models.json file
+
+Processing:
+
+download the image from the url and save to the temp_images folder
+use BedrockImageProcessor to call the right model with prompt and an image one by one, which will return a transcription and associated data
+the app should save each transcription to the transcriptions folder and the BedrockImageProcessor should save each raw LLM response to the raw_llm_responses folder
