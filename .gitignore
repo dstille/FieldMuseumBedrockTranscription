@@ -1,0 +1,33 @@
+# Application specific folders
+temp_images/
+transcriptions/
+raw_llm_responses/
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
