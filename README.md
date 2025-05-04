@@ -1,70 +1,61 @@
-# Bedrock Image Transcription App
+# Field Museum Bedrock Transcription
 
-A Streamlit application that processes images from URLs using AWS Bedrock models.
+A tool for transcribing herbarium specimen labels using AWS Bedrock models.
 
 ## Setup
 
-1. Install required dependencies:
+1. Run the setup script to create necessary directories and install requirements:
    ```
-   pip install streamlit boto3 requests
+   python setup.py
    ```
 
-2. Configure AWS credentials:
-   - Set environment variables:
-     ```
-     AWS_ACCESS_KEY_ID=your_access_key
-     AWS_SECRET_ACCESS_KEY=your_secret_key
-     AWS_REGION=us-east-1  # or your preferred region
-     ```
-   - Or configure using AWS CLI:
-     ```
-     aws configure
-     ```
+2. Configure your AWS credentials in the `.env` file:
+   ```
+   AWS_ACCESS_KEY_ID=your_access_key_here
+   AWS_SECRET_ACCESS_KEY=your_secret_key_here
+   AWS_REGION=us-east-1
+   ```
 
-3. Update available models:
-   ```
-   python available_models.py
-   ```
-   This will update the `selected_models.json` file with models available in your AWS account.
+3. Place your prompt files in the `prompts` directory.
 
 ## Running the App
 
+Start the Streamlit app:
 ```
 streamlit run app.py
 ```
 
-## Usage
+## Testing Models
 
-1. Select a prompt from the prompts folder
-2. Upload a text file containing image URLs (one per line)
-3. Select a Bedrock model
-4. Click "Process Images"
+To test all image-capable models with a single image:
 
-## Troubleshooting
+1. Place a test image in the `test_images` directory
+2. Update the `IMAGE_PATH` and `PROMPT_FILE` variables in `models_image_test.py` if needed
+3. Run the test script:
+   ```
+   python models_image_test.py
+   ```
 
-### Model Invocation Errors
+Test results will be saved in the `test_results` directory.
 
-If you encounter errors like:
-```
-ValidationException: Invocation of model ID ... with on-demand throughput isn't supported
-```
+## Directory Structure
 
-This means the selected model doesn't support on-demand throughput. Try:
-
-1. Running `python available_models.py` to update the model list
-2. Selecting a different model
-3. Creating an inference profile for the model in the AWS Bedrock console
-
-### Authentication Errors
-
-If you see authentication errors, check:
-1. Your AWS credentials are correctly set
-2. Your AWS account has access to AWS Bedrock
-3. You have enabled the models you want to use in the AWS Bedrock console
-
-## Folders
-
-- `prompts/`: Contains text prompts for image processing
+- `models/`: Model-specific processor classes
+- `prompts/`: Prompt templates
+- `transcriptions/`: Saved transcription outputs
+- `data/`: Cost and usage data
+- `test_images/`: Images for model testing
+- `test_results/`: Model comparison results
 - `temp_images/`: Temporary storage for downloaded images
-- `transcriptions/`: Output folder for transcription results
-- `raw_llm_responses/`: Raw JSON responses from the LLM models
+- `raw_llm_responses/`: Raw responses from LLM models
+
+## Output Formats
+
+Transcriptions can be saved in three formats:
+- JSON: Structured data format
+- TXT: Plain text format
+- CSV: Spreadsheet format
+
+## Cost Tracking
+
+Cost data for each run is saved in the `data` directory as `{volume_name}-data.json`.

@@ -38,6 +38,8 @@ class BaseImageProcessor(ABC):
         self.bedrock_client = self._initialize_bedrock_client()
         # Convert text prompt to JSON if it's not already in JSON format
         self.prompt_json = self._ensure_json_prompt(prompt_text)
+        # Inference profile ARN for models that require it
+        self.inference_profile_arn = None
     
     def _initialize_bedrock_client(self):
         """Initialize the Bedrock client with configuration"""
@@ -204,10 +206,18 @@ class BaseImageProcessor(ABC):
             
             request_body = self._format_prompt(base64_image)
             
-            response = self.bedrock_client.invoke_model(
-                modelId=self.model,
-                body=json.dumps(request_body)
-            )
+            # Prepare invoke_model parameters
+            invoke_params = {
+                'modelId': self.model,
+                'body': json.dumps(request_body)
+            }
+            
+            # Add inference profile ARN if available
+            if self.inference_profile_arn:
+                invoke_params['inferenceProfileArn'] = self.inference_profile_arn
+            
+            # Invoke the model
+            response = self.bedrock_client.invoke_model(**invoke_params)
             
             response_body = json.loads(response.get('body').read())
             self.save_raw_response(response_body, image_ref)

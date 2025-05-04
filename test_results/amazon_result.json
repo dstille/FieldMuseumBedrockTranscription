@@ -1,0 +1,46 @@
+{
+  "model": "us.amazon.nova-lite-v1:0",
+  "timestamp": "2025-05-04T15:58:17.926480",
+  "result": {
+    "verbatimCollectors": "John J. Engel, Matt von Konrat & John E. Braggins",
+    "collectedBy": "John J. Engel",
+    "secondaryCollectors": "Matt von Konrat | John E. Braggins",
+    "recordNumber": "23773",
+    "verbatimEventDate": "12 February 2003",
+    "minimumEventDate": "2003-02-12",
+    "maximumEventDate": "N/A",
+    "verbatimIdentification": "Telaranea lindenbergii var. papillata Engel & Merre.",
+    "latestScientificName": "Telaranea lindenbergii var. papillata",
+    "identifiedBy": "N/A",
+    "verbatimDateIdentified": "N/A",
+    "associatedTaxa": "N/A",
+    "country": "New Zealand",
+    "firstPoliticalUnit": "Auckland",
+    "secondPoliticalUnit": "N/A",
+    "municipality": "N/A",
+    "verbatimLocality": "NORTH ISLAND. AUCKLAND PROV.: Whaereirino Forest, start of track to Leitch's Hut. 280 m, 38° 24.5' S, 174° 49.8' E. Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
+    "locality": "NORTH ISLAND. AUCKLAND PROV.: Whaereirino Forest, start of track to Leitch's Hut. 280 m, 38 degrees 24.5 minutes S, 174 degrees 49.8 minutes E. Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
+    "habitat": "Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
+    "verbatimElevation": "280 m",
+    "verbatimCoordinates": "38° 24.5' S, 174° 49.8' E",
+    "otherCatalogNumbers": "1173554",
+    "originalMethod": "Typed",
+    "typeStatus": "Holotype"
+  },
+  "metrics": {
+    "model_id": "us.amazon.nova-lite-v1:0",
+    "model_name": "amazon",
+    "status": "success",
+    "processing_time_seconds": 6.627477169036865,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0
+    },
+    "costs": {
+      "input": 0.0,
+      "output": 0.0,
+      "total": 0.0
+    }
+  }
+}

@@ -1,14 +1,12 @@
 import streamlit as st
 import os
 import json
-import csv
 import requests
 import base64
 from pathlib import Path
 import time
-import datetime
 import boto3
-from model_factory import ModelFactory
+from bedrock_interface import BedrockImageProcessor
 
 # Set page configuration
 st.set_page_config(
@@ -120,6 +118,8 @@ def save_transcriptions_txt(transcriptions, volume_name):
 
 # Save transcriptions to a CSV file
 def save_transcriptions_csv(transcriptions, volume_name):
+    import csv
+    
     # Create the CSV filename
     filename = f"{TRANSCRIPTIONS_DIR}/{volume_name}.csv"
     
@@ -157,6 +157,8 @@ def save_transcriptions_csv(transcriptions, volume_name):
 
 # Save cost data to a JSON file
 def save_cost_data(volume_name, model_id, model_name, results, prompt_name):
+    import datetime
+    
     # Create the data filename
     filename = f"{DATA_DIR}/{volume_name}-data.json"
     
@@ -233,7 +235,7 @@ def main():
         uploaded_file = st.file_uploader("Upload a text file with URLs (one per line)", type=["txt"])
         
         # Filter models by image capability
-        image_capable_models = ModelFactory.filter_image_capable_models(all_models)
+        image_capable_models = [model for model in all_models if BedrockImageProcessor.is_model_image_capable(model)]
         
         # Show model selection options
         st.subheader("3. Select Bedrock Model")
@@ -311,8 +313,8 @@ def main():
             image_name = Path(image_path).stem
             
             try:
-                # Use the model factory to get the appropriate processor
-                processor = ModelFactory.get_processor(
+                # Create processor for this model
+                processor = BedrockImageProcessor(
                     api_key="",  # Empty as we're using AWS credentials from environment
                     prompt_name=selected_prompt_name,
                     prompt_text=selected_prompt_text,

@@ -1,0 +1,46 @@
+{
+  "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+  "timestamp": "2025-05-04T16:14:31.674191",
+  "result": {
+    "verbatimCollectors": "John J. Engel, Matt von Konrat & John E. Braggins",
+    "collectedBy": "J. J. Engel",
+    "secondaryCollectors": "M. von Konrat | J. E. Braggins",
+    "recordNumber": "23773",
+    "verbatimEventDate": "12 February 2003",
+    "minimumEventDate": "2003-02-12",
+    "maximumEventDate": "N/A",
+    "verbatimIdentification": "Telaranea lindenbergii var. papillata Engel & Merr.",
+    "latestScientificName": "Telaranea lindenbergii var. papillata",
+    "identifiedBy": "N/A",
+    "verbatimDateIdentified": "N/A",
+    "associatedTaxa": "Blechnum novae-zelandiae | Weinmannia | Dicksonia squarrosa | Leptospermum scoparium",
+    "country": "New Zealand",
+    "firstPoliticalUnit": "North Island",
+    "secondPoliticalUnit": "Auckland",
+    "municipality": "N/A",
+    "verbatimLocality": "NORTH ISLAND, AUCKLAND PROV.: Whareorino Forest, start of track to Leitch's Hut, 280 m., 38° 24.5' S., 174° 49.8' E.",
+    "locality": "Whareorino Forest, start of track to Leitch's Hut",
+    "habitat": "On clayey bank. Clay banks with Blechnum novae-zelandiae overhang, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium",
+    "verbatimElevation": "280 m.",
+    "verbatimCoordinates": "38° 24.5' S., 174° 49.8' E.",
+    "otherCatalogNumbers": "1173554",
+    "originalMethod": "Typed",
+    "typeStatus": "holotype"
+  },
+  "metrics": {
+    "model_id": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    "model_name": "claude",
+    "status": "success",
+    "processing_time_seconds": 14.910820484161377,
+    "tokens": {
+      "input": 3224,
+      "output": 531,
+      "total": 3755
+    },
+    "costs": {
+      "input": 0.048,
+      "output": 0.04,
+      "total": 0.088
+    }
+  }
+}

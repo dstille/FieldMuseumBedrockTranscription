@@ -1,0 +1,23 @@
+{
+  "model": "mistral.mistral-small-2402-v1:0",
+  "timestamp": "2025-05-04T16:16:27.266644",
+  "result": {
+    "raw_text": "\n\n{\n\"verbatimCollectors\": \"leg. R. M. Schuster & J. R. Reeder\",\n\"collectedBy\": \"R. M. Schuster\",\n\"secondaryCollectors\": \"J. R. Reeder\",\n\"recordNumber\": \"10000\",\n\"verbatimEventDate\": \"1985\",\n\"minimumEventDate\": \"1985-00-00\",\n\"maximumEventDate\": \"N/A\",\n\"verbatimIdentification\": \"Astragalus lentiginosus var. lentiginosus\",\n\"latestScientificName\": \"Astragalus lentiginosus\",\n\"identifiedBy\": \"R. M. Schuster\",\n\"verbatimDateIdentified\": \"1985\",\n\"associatedTaxa\": \"N/A\",\n\"country\": \"United States\",\n\"firstPoliticalUnit\": \"Colorado\",\n\"secondPoliticalUnit\": \"N/A\",\n\"municipality\": \"N/A\",\n\"verbatimLocality\": \"Near Silverton, San Juan Co.\",\n\"locality\": \"Near Silverton, San Juan County\",\n\"habitat\": \"Gravelly slope, 11,000 ft.\",\n\"verbatimElevation\": \"11,000 ft.\",\n\"verbatimCoordinates\": \"N/A\",\n\"otherCatalogNumbers\": \"N/A\",\n\"originalMethod\": \"Handwritten\"\n\"typeStatus\": \"no type status\"\n}"
+  },
+  "metrics": {
+    "model_id": "mistral.mistral-small-2402-v1:0",
+    "model_name": "mistral",
+    "status": "success",
+    "processing_time_seconds": 6.901226043701172,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0
+    },
+    "costs": {
+      "input": 0.0,
+      "output": 0.0,
+      "total": 0.0
+    }
+  }
+}

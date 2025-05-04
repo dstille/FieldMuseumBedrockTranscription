@@ -1,0 +1,662 @@
+{
+  "test_id": "image_test_20250504_161226",
+  "timestamp": "2025-05-04T16:12:26.734940",
+  "image": "test_images/test_image.jpg",
+  "prompt_file": "prompts/1.5Stripped.txt",
+  "models_tested": 92,
+  "results": [
+    {
+      "model_id": "amazon.titan-tg1-large",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-image-generator-v1:0",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-image-generator-v1",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-image-generator-v2:0",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-premier-v1:0:8k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-premier-v1:0:20k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-premier-v1:0:1000k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-premier-v1:0:mm",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-premier-v1:0",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-text-premier-v1:0",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-pro-v1:0:24k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-pro-v1:0:300k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-pro-v1:0",
+      "model_name": "nova",
+      "status": "success",
+      "processing_time_seconds": 9.637909412384033,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "amazon.nova-lite-v1:0:24k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-lite-v1:0:300k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-lite-v1:0",
+      "model_name": "nova",
+      "status": "success",
+      "processing_time_seconds": 6.733003377914429,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "amazon.nova-canvas-v1:0",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-reel-v1:0",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-reel-v1:1",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-micro-v1:0:24k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-micro-v1:0:128k",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-micro-v1:0",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.nova-sonic-v1:0",
+      "model_name": "nova",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-g1-text-02",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-text-lite-v1:0:4k",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-text-lite-v1",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-text-express-v1:0:8k",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-text-express-v1",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-text-v1:2:8k",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-text-v1",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-text-v2:0:8k",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-text-v2:0",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-image-v1:0",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "amazon.titan-embed-image-v1",
+      "model_name": "titan",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "stability.stable-diffusion-xl-v1:0",
+      "model_name": "stable",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "stability.stable-diffusion-xl-v1",
+      "model_name": "stable",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "ai21.jamba-instruct-v1:0",
+      "model_name": "jamba",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "ai21.jamba-1-5-large-v1:0",
+      "model_name": "jamba",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "ai21.jamba-1-5-mini-v1:0",
+      "model_name": "jamba",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-instant-v1:2:100k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-instant-v1",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2:0:18k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2:0:100k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2:1:18k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2:1:200k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2:1",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-v2",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-sonnet-20240229-v1:0:28k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-sonnet-20240229-v1:0:200k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-sonnet-20240229-v1:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-haiku-20240307-v1:0:48k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-haiku-20240307-v1:0:200k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-haiku-20240307-v1:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-opus-20240229-v1:0:12k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-opus-20240229-v1:0:28k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-opus-20240229-v1:0:200k",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-opus-20240229-v1:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "model_name": "claude",
+      "status": "success",
+      "processing_time_seconds": 14.910820484161377,
+      "tokens": {
+        "input": 3224,
+        "output": 531,
+        "total": 3755
+      },
+      "costs": {
+        "input": 0.048,
+        "output": 0.04,
+        "total": 0.088
+      }
+    },
+    {
+      "model_id": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "anthropic.claude-3-5-haiku-20241022-v1:0",
+      "model_name": "claude",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.command-text-v14:7:4k",
+      "model_name": "command",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.command-text-v14",
+      "model_name": "command",
+      "status": "success",
+      "processing_time_seconds": 17.453965425491333,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "cohere.command-r-v1:0",
+      "model_name": "command",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.command-r-plus-v1:0",
+      "model_name": "command",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.command-light-text-v14:7:4k",
+      "model_name": "command",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.command-light-text-v14",
+      "model_name": "command",
+      "status": "success",
+      "processing_time_seconds": 9.011402368545532,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "cohere.embed-english-v3:0:512",
+      "model_name": "embed",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.embed-english-v3",
+      "model_name": "embed",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.embed-multilingual-v3:0:512",
+      "model_name": "embed",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "cohere.embed-multilingual-v3",
+      "model_name": "embed",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "deepseek.r1-v1:0",
+      "model_name": "r1",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-8b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-70b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-1-8b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-1-70b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-2-11b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-2-90b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-2-1b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-2-3b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama3-3-70b-instruct-v1:0",
+      "model_name": "llama3",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-scout-17b-instruct-v1:0:128k",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-scout-17b-instruct-v1:0:10m",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-scout-17b-instruct-v1:0",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-maverick-17b-instruct-v1:0:128k",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-maverick-17b-instruct-v1:0:1m",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "meta.llama4-maverick-17b-instruct-v1:0",
+      "model_name": "llama4",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    },
+    {
+      "model_id": "mistral.mistral-7b-instruct-v0:2",
+      "model_name": "mistral",
+      "status": "success",
+      "processing_time_seconds": 5.122677326202393,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "mistral.mixtral-8x7b-instruct-v0:1",
+      "model_name": "mixtral",
+      "status": "success",
+      "processing_time_seconds": 5.7028748989105225,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "mistral.mistral-large-2402-v1:0",
+      "model_name": "mistral",
+      "status": "success",
+      "processing_time_seconds": 16.84585666656494,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "mistral.mistral-small-2402-v1:0",
+      "model_name": "mistral",
+      "status": "success",
+      "processing_time_seconds": 6.901226043701172,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "total": 0
+      },
+      "costs": {
+        "input": 0.0,
+        "output": 0.0,
+        "total": 0.0
+      }
+    },
+    {
+      "model_id": "mistral.pixtral-large-2502-v1:0",
+      "model_name": "pixtral",
+      "status": "error",
+      "error": "'NoneType' object has no attribute 'get'"
+    }
+  ],
+  "summary": {
+    "successful_models": 9,
+    "failed_models": 83,
+    "fastest_model": "mistral.mistral-7b-instruct-v0:2",
+    "slowest_model": "cohere.command-text-v14",
+    "cheapest_model": "amazon.nova-pro-v1:0",
+    "most_expensive_model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    "average_time": 10.257748444875082,
+    "average_cost": 0.009777777777777778,
+    "total_cost": 0.088
+  }
+}
