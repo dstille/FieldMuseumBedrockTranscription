@@ -2,6 +2,12 @@
 
 A tool for transcribing herbarium specimen labels using AWS Bedrock models.
 
+## Requirements
+
+- **Python 3.9 or newer** (required for dictionary merging with the `|` operator)
+- AWS account with access to Bedrock models
+- AWS credentials with appropriate permissions
+
 ## Setup
 
 1. Run the setup script to create necessary directories and install requirements:
@@ -17,6 +23,16 @@ A tool for transcribing herbarium specimen labels using AWS Bedrock models.
    ```
 
 3. Place your prompt files in the `prompts` directory.
+
+## Virtual Environment (Optional)
+
+The setup script can create a virtual environment for you:
+
+1. When prompted during setup, choose 'y' to create a virtual environment
+2. Activate the virtual environment:
+   - Windows: Run `activate.bat`
+   - Unix/Linux/Mac: Run `source activate.sh`
+3. When finished, type `deactivate` to exit the virtual environment
 
 ## Running the App
 
@@ -59,3 +75,15 @@ Transcriptions can be saved in three formats:
 ## Cost Tracking
 
 Cost data for each run is saved in the `data` directory as `{volume_name}-data.json`.
+
+## Supported Models
+
+The application has been tested with the following AWS Bedrock models:
+
+- Anthropic Claude 3 (Sonnet, Haiku, Opus)
+- Anthropic Claude 3.5 Sonnet
+- Amazon Nova and Nova Lite
+- Meta Llama 4 (Scout, Maverick)
+- Mistral Pixtral
+
+Additional models may work but have not been extensively tested.

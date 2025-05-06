@@ -161,8 +161,9 @@ def check_python_version():
     print_header("Checking Python Version")
     
     major, minor = sys.version_info[:2]
-    if major < 3 or (major == 3 and minor < 8):
-        print_error(f"Python 3.8+ is required. You are using Python {major}.{minor}")
+    if major < 3 or (major == 3 and minor < 9):
+        print_error(f"Python 3.9+ is required. You are using Python {major}.{minor}")
+        print_warning("This code uses features like dictionary merging with the '|' operator that require Python 3.9+")
         return False
     
     print_success(f"Python version {major}.{minor} is compatible")
@@ -290,7 +291,11 @@ def main():
     print_header("Field Museum Bedrock Transcription App Setup")
     
     if not check_python_version():
-        sys.exit(1)
+        print_warning("Continuing with setup, but some features may not work correctly.")
+        proceed = input(f"{Colors.BLUE}Do you want to proceed anyway? (y/n): {Colors.ENDC}")
+        if proceed.lower() != 'y':
+            print_error("Setup aborted. Please install Python 3.9 or newer.")
+            sys.exit(1)
     
     create_directories()
     create_gitignore()
@@ -346,6 +351,7 @@ To activate the virtual environment:
 After activating the virtual environment:
 1. Make sure to update your AWS credentials in the .env file
 2. Run the app with: {Colors.BOLD}streamlit run app.py{Colors.ENDC}
+3. Test image processing with: {Colors.BOLD}python models_image_test.py{Colors.ENDC}
 
 {Colors.BLUE}Happy transcribing!{Colors.ENDC}
 """)
@@ -356,6 +362,7 @@ After activating the virtual environment:
 To run the application:
 1. Make sure to update your AWS credentials in the .env file
 2. Run the app with: {Colors.BOLD}streamlit run app.py{Colors.ENDC}
+3. Test image processing with: {Colors.BOLD}python models_image_test.py{Colors.ENDC}
 
 {Colors.BLUE}Happy transcribing!{Colors.ENDC}
 """)
