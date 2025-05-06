@@ -135,6 +135,37 @@ class BedrockImageProcessor:
                 return {"raw_text": text, "error": "Could not parse as JSON"}
     
     @staticmethod
+    def get_verified_image_models():
+        """
+        Get a list of models that have been verified to work with images.
+        This list is based on testing results and official documentation.
+        
+        Returns:
+            A list of model IDs that support image processing
+        """
+        return [
+            # Anthropic Claude models
+            "anthropic.claude-3-sonnet-20240229-v1:0",
+            "anthropic.claude-3-haiku-20240307-v1:0",
+            "anthropic.claude-3-opus-20240229-v1:0",
+            "anthropic.claude-3-5-sonnet-20240620-v1:0",
+            "anthropic.claude-3-7-sonnet-20250219-v1:0",
+            
+            # Amazon Nova models
+            "us.amazon.nova-lite-v1:0",
+            "us.amazon.nova-v1:0",
+            "amazon.nova-lite-v1:0",
+            "amazon.nova-v1:0",
+            
+            # Meta Llama models
+            "meta.llama4-scout-17b-instruct-v1:0",
+            "meta.llama4-maverick-17b-instruct-v1:0",
+            
+            # Mistral models
+            "mistral.pixtral-large-2502-v1:0"
+        ]
+    
+    @staticmethod
     def is_model_image_capable(model_id):
         """
         Check if a model supports image processing.
@@ -145,8 +176,8 @@ class BedrockImageProcessor:
         Returns:
             True if the model supports image processing, False otherwise
         """
-        # List of models that support image processing
-        image_capable_models = [
+        # List of model families that support image processing
+        image_capable_families = [
             "anthropic.claude-3",  # All Claude 3 models
             "anthropic.claude-3-5", # Claude 3.5 models
             "anthropic.claude-3-7", # Claude 3.7 models
@@ -157,9 +188,16 @@ class BedrockImageProcessor:
             "us.amazon.nova"  # US Amazon Nova models
         ]
         
-        # Check if the model is in the list of image-capable models
-        for model_prefix in image_capable_models:
-            if model_prefix in model_id:
+        # Get the list of verified image-capable models
+        verified_models = BedrockImageProcessor.get_verified_image_models()
+        
+        # Check if the model is in the verified list
+        if model_id in verified_models:
+            return True
+        
+        # Check if the model belongs to a known image-capable family
+        for family in image_capable_families:
+            if family in model_id:
                 return True
         
         return False
@@ -263,6 +301,34 @@ class BedrockImageProcessor:
                 # Note: No response_format for Claude 3.5
             }
         
+        # Anthropic Claude 3.7 models (may have different format)
+        elif "anthropic.claude-3-7" in self.model:
+            return {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 4096,
+                "temperature": 0,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": structured_prompt
+                            },
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/jpeg",
+                                    "data": base64_image
+                                }
+                            }
+                        ]
+                    }
+                ]
+                # Note: No response_format for Claude 3.7 (similar to 3.5)
+            }
+        
         # Anthropic Claude 3 models (original versions)
         elif "anthropic.claude-3" in self.model:
             return {
@@ -324,8 +390,8 @@ class BedrockImageProcessor:
                 "inferenceConfig": inf_params,
             }
         
-        # Meta Llama models (all versions)
-        elif "meta.llama" in self.model:
+        # Meta Llama 4 models (vision capable)
+        elif "meta.llama4" in self.model:
             return {
                 "prompt": f"{structured_prompt}\n[IMAGE]{base64_image}[/IMAGE]",
                 "max_gen_len": 4096,
@@ -334,7 +400,7 @@ class BedrockImageProcessor:
                 "response_format": {"type": "json_object"}
             }
         
-        # Mistral models with image capability (Pixtral)
+        # Mistral Pixtral models
         elif "mistral.pixtral" in self.model:
             return {
                 "prompt": f"<s>[INST] {structured_prompt} [/INST]",

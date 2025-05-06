@@ -1,46 +1,24 @@
 {
-  "model": "amazon.nova-lite-v1:0",
-  "timestamp": "2025-05-04T16:13:09.647469",
+  "model": "amazon.nova-sonic-v1:0",
+  "timestamp": "2025-05-05T09:45:20.965566",
   "result": {
-    "verbatimCollectors": "John J. Engel, Matt von Konrat & John E. Braggins",
-    "collectedBy": "John J. Engel",
-    "secondaryCollectors": "Matt von Konrat | John E. Braggins",
-    "recordNumber": "23773",
-    "verbatimEventDate": "12 February 2003",
-    "minimumEventDate": "2003-02-12",
-    "maximumEventDate": "N/A",
-    "verbatimIdentification": "Telaranea lindenbergii var. papillata Engel & Merre.",
-    "latestScientificName": "Telaranea lindenbergii var. papillata",
-    "identifiedBy": "N/A",
-    "verbatimDateIdentified": "N/A",
-    "associatedTaxa": "N/A",
-    "country": "New Zealand",
-    "firstPoliticalUnit": "Auckland",
-    "secondPoliticalUnit": "N/A",
-    "municipality": "N/A",
-    "verbatimLocality": "NORTH ISLAND. AUCKLAND PROV.: Whaereirino Forest, start of track to Leitch's Hut. 280 m, 38° 24.5' S, 174° 49.8' E. Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
-    "locality": "NORTH ISLAND. AUCKLAND PROV.: Whaereirino Forest, start of track to Leitch's Hut. 280 m, 38 degrees 24.5 minutes S, 174 degrees 49.8 minutes E. Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
-    "habitat": "Clay banks with Blechnum novae-zelandiae overhanging, Weinmannia and Dicksonia squarrosa dominant canopy and occasional Leptospermum scoparium.",
-    "verbatimElevation": "280 m",
-    "verbatimCoordinates": "38° 24.5' S, 174° 49.8' E",
-    "otherCatalogNumbers": "1173554",
-    "originalMethod": "Typed",
-    "typeStatus": "Holotype"
+    "raw_text": "Error processing image 1 image 'test_image':\n An error occurred (ValidationException) when calling the InvokeModel operation: This action doesn't support the model that you provided. Try again with a supported text or chat model."
   },
   "metrics": {
-    "model_id": "amazon.nova-lite-v1:0",
+    "model_id": "amazon.nova-sonic-v1:0",
     "model_name": "nova",
-    "status": "success",
-    "processing_time_seconds": 6.733003377914429,
+    "status": "error",
+    "processing_time_seconds": 0.572298526763916,
     "tokens": {
       "input": 0,
       "output": 0,
       "total": 0
     },
     "costs": {
-      "input": 0.0,
-      "output": 0.0,
-      "total": 0.0
-    }
+      "input": 0,
+      "output": 0,
+      "total": 0
+    },
+    "error": "Found error pattern: error"
   }
 }
