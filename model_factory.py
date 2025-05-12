@@ -1,176 +1,61 @@
-"""
-Model factory for AWS Bedrock image processors.
-This module provides a factory class to create the appropriate processor for a given model.
-"""
+from bedrock_interface import (
+    BedrockImageProcessor,
+    ClaudeImageProcessor,
+    NovaImageProcessor,
+    AmazonImageProcessor,
+    MetaImageProcessor,
+    MistralImageProcessor,
+    create_image_processor
+)
+import json
+from typing import Dict, Any, Optional
 
-import boto3
-import os
-from models.anthropic import AnthropicImageProcessor
-from models.meta import MetaImageProcessor
-from models.mistral import MistralImageProcessor
-from models.cohere import CohereImageProcessor
-from models.amazon import AmazonTitanImageProcessor
-from models.ai21 import AI21ImageProcessor
+def get_vision_models() -> Dict[str, Any]:
+    """Get the list of models that support vision capabilities."""
+    try:
+        # Try to load from model_info directory first
+        try:
+            with open("model_info/vision_model_info.json", "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            # Fall back to root directory
+            with open("vision_model_info.json", "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading vision models: {str(e)}")
+        return []
 
-class ModelFactory:
-    """Factory class for creating model-specific processors."""
+def get_best_vision_model() -> Optional[Dict[str, Any]]:
+    """Get the best vision model based on test results."""
+    models = get_vision_models()
     
-    @staticmethod
-    def get_processor(api_key, prompt_name, prompt_text, model, modelname):
-        """
-        Get the appropriate processor for the given model.
-        
-        Args:
-            api_key: API key (not used for AWS Bedrock, but kept for compatibility)
-            prompt_name: Name of the prompt
-            prompt_text: Text of the prompt
-            model: Model ID
-            modelname: Display name of the model
-            
-        Returns:
-            An instance of the appropriate processor class
-        """
-        if "anthropic.claude" in model:
-            return AnthropicImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        elif "meta.llama" in model:
-            return MetaImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        elif "mistral." in model:
-            return MistralImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        elif "cohere." in model:
-            return CohereImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        elif "amazon.titan" in model:
-            return AmazonTitanImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        elif "ai21." in model:
-            return AI21ImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
-        else:
-            # Default to Anthropic for unknown models
-            print(f"Warning: Unknown model {model}, defaulting to Anthropic processor")
-            return AnthropicImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+    if not models:
+        return None
     
-    @staticmethod
-    def get_image_capable_models():
-        """
-        Get a list of model families that support image processing.
-        
-        Returns:
-            A list of model family prefixes that support image processing
-        """
-        return [
-            "anthropic.claude-3",
-            "anthropic.claude-3-5",
-            "anthropic.claude-3-7",
-            "meta.llama4",
-            "mistral.pixtral"
-        ]
+    # Sort by success, then by output tokens (higher is better), then by elapsed time (lower is better)
+    sorted_models = sorted(
+        models,
+        key=lambda m: (
+            m.get("image_test_success", False),
+            m.get("last_test_details", {}).get("output_tokens", 0),
+            -m.get("last_test_details", {}).get("elapsed_seconds", float("inf"))
+        ),
+        reverse=True
+    )
     
-    @staticmethod
-    def model_supports_images(model_id):
-        """
-        Check if a model supports image processing.
-        
-        Args:
-            model_id: The model ID to check
-            
-        Returns:
-            True if the model supports image processing, False otherwise
-        """
-        image_capable_models = ModelFactory.get_image_capable_models()
-        
-        for model_prefix in image_capable_models:
-            if model_prefix in model_id:
-                return True
-        
-        return False
+    return sorted_models[0] if sorted_models else None
+
+def create_best_vision_processor(prompt_name: str, prompt_text: str) -> Optional[BedrockImageProcessor]:
+    """Create an image processor using the best available vision model."""
+    best_model = get_best_vision_model()
     
-    @staticmethod
-    def filter_image_capable_models(model_ids):
-        """
-        Filter a list of model IDs to only include those that support image processing.
-        
-        Args:
-            model_ids: A list of model IDs to filter
-            
-        Returns:
-            A list of model IDs that support image processing
-        """
-        # First filter by capability
-        capable_models = [
-            model_id for model_id in model_ids
-            if ModelFactory.model_supports_images(model_id)
-        ]
-        
-        # Then filter by availability (check which models are actually accessible)
-        available_models = []
-        for model_id in capable_models:
-            if ModelFactory.is_model_available(model_id):
-                available_models.append(model_id)
-            else:
-                print(f"Warning: Model {model_id} supports images but is not available in your account or region")
-        
-        return available_models
+    if not best_model:
+        return None
     
-    @staticmethod
-    def is_model_available(model_id):
-        """
-        Check if a model is available in the current AWS account and region.
-        
-        Args:
-            model_id: The model ID to check
-            
-        Returns:
-            True if the model is available, False otherwise
-        """
-        try:
-            # Initialize Bedrock client
-            bedrock = boto3.client(
-                'bedrock',
-                region_name=os.getenv('AWS_REGION', 'us-east-1'),
-                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
-            )
-            
-            # Try to get the model
-            response = bedrock.get_foundation_model(modelIdentifier=model_id)
-            
-            # If we get here, the model exists and is accessible
-            return True
-            
-        except Exception as e:
-            # If we get an error, the model might not be available
-            print(f"Model availability check for {model_id}: {str(e)}")
-            return False
+    model_id = best_model.get("modelId")
+    model_name = best_model.get("modelName")
     
-    @staticmethod
-    def get_available_inference_profiles():
-        """
-        Get a list of available inference profiles in the current AWS account and region.
-        
-        Returns:
-            A list of inference profile ARNs
-        """
-        try:
-            # Initialize Bedrock client
-            bedrock = boto3.client(
-                'bedrock',
-                region_name=os.getenv('AWS_REGION', 'us-east-1'),
-                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
-            )
-            
-            # List inference profiles
-            response = bedrock.list_inference_profiles()
-            
-            # Extract profile ARNs
-            profiles = []
-            for profile in response.get('inferenceProfiles', []):
-                profiles.append({
-                    'name': profile.get('name'),
-                    'arn': profile.get('inferenceProfileArn'),
-                    'models': profile.get('foundationModelArns', [])
-                })
-            
-            return profiles
-            
-        except Exception as e:
-            print(f"Error getting inference profiles: {str(e)}")
-            return []
+    if not model_id or not model_name:
+        return None
+    
+    return create_image_processor("", prompt_name, prompt_text, model_id, model_name)

@@ -41,11 +41,37 @@ class ImageProcessor:
         directory = f"{self.raw_response_folder}/{self.modelname}"
         self.ensure_directory_exists(directory)
         filename = f"{directory}/{image_name}-{self.get_timestamp()}-raw.json"
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(response_data, f, ensure_ascii=False, indent=4)             
+        
+        # Limit the size of the response data to avoid huge files
+        max_size = 10000  # Maximum characters to save
+        
+        try:
+            # Import base64_filter here to avoid circular imports
+            from utilities.base64_filter import filter_base64_from_dict
+            
+            # Filter out base64 content before saving
+            filtered_data = filter_base64_from_dict(response_data)
+            
+            # Convert to string and check size
+            response_str = json.dumps(filtered_data, ensure_ascii=False, indent=4)
+            if len(response_str) > max_size:
+                # Create a truncated version
+                truncated_data = {"truncated_response": True, "message": "Response was too large and has been truncated"}
+                with open(filename, 'w', encoding='utf-8') as f:
+                    json.dump(truncated_data, f, ensure_ascii=False, indent=4)
+            else:
+                # Save the filtered response
+                with open(filename, 'w', encoding='utf-8') as f:
+                    json.dump(filtered_data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Error saving raw response: {str(e)}")
 
     def update_usage(self, response_data):
         if "usage" in response_data:
             usage = response_data["usage"]
             self.input_tokens = int(usage.get("prompt_tokens", 0))
             self.output_tokens = int(usage.get("completion_tokens", 0))                           
+
+    def set_token_costs_per_mil(self):
+        self.input_cost_per_mil = 0.0
+        self.output_cost_per_mil = 0.0

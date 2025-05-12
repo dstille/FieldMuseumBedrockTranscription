@@ -31,7 +31,8 @@ DIRECTORIES = [
     "logs",
     "data",
     "test_images",
-    "test_results"
+    "test_results",
+    "model_info"  # Added model_info directory
 ]
 
 # Requirements for the application
@@ -41,7 +42,8 @@ REQUIREMENTS = [
     "requests",
     "python-dotenv",
     "pillow",
-    "tabulate"
+    "tabulate",
+    "pandas"
 ]
 
 # Virtual environment name
@@ -53,15 +55,15 @@ def print_header(message):
 
 def print_success(message):
     """Print a success message"""
-    print(f"{Colors.GREEN}✓ {message}{Colors.ENDC}")
+    print(f"{Colors.GREEN}+ {message}{Colors.ENDC}")
 
 def print_warning(message):
     """Print a warning message"""
-    print(f"{Colors.WARNING}⚠ {message}{Colors.ENDC}")
+    print(f"{Colors.WARNING}! {message}{Colors.ENDC}")
 
 def print_error(message):
     """Print an error message"""
-    print(f"{Colors.FAIL}✗ {message}{Colors.ENDC}")
+    print(f"{Colors.FAIL}x {message}{Colors.ENDC}")
 
 def create_directories():
     """Create all necessary directories for the application"""
@@ -86,52 +88,27 @@ def create_directories():
                     "Format your response as plain text, preserving the layout as much as possible.\n\n"
                     "If there are any parts that are illegible or uncertain, indicate this with [illegible].")
         print_success("Created sample prompt file")
-
-def create_gitignore():
-    """Create or update .gitignore file"""
-    print_header("Setting up .gitignore")
     
-    gitignore_content = """# Application specific folders
-temp_images/
-transcriptions/
-raw_llm_responses/
-logs/
+    # Create a sample test image if test_images directory is empty
+    test_images_dir = Path("test_images")
+    if not any(test_images_dir.iterdir()) if test_images_dir.exists() else False:
+        # Create a .gitkeep file to ensure the directory is tracked by git
+        gitkeep_path = test_images_dir / ".gitkeep"
+        with open(gitkeep_path, "w") as f:
+            pass
+        print_success("Created .gitkeep file in test_images directory")
+        print_warning("Please add test images to the test_images directory")
 
-# Environment variables
-.env
-.env.local
-
-# Python cache files
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-
-# IDE specific files
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS specific files
-.DS_Store
-Thumbs.db
-"""
+def check_gitignore():
+    """Check if .gitignore file exists"""
+    print_header("Checking .gitignore")
     
-    try:
-        with open(".gitignore", "w", encoding="utf-8") as f:
-            f.write(gitignore_content)
-        print_success("Created .gitignore file")
-    except Exception as e:
-        print_error(f"Failed to create .gitignore file: {str(e)}")
+    if os.path.exists(".gitignore"):
+        print_success(".gitignore file already exists")
+    else:
+        print_warning("No .gitignore file found")
+        print_warning("Please create a .gitignore file manually or use a git client to generate one")
+        print_warning("You should exclude: temp_images/, transcriptions/, raw_llm_responses/, logs/, data/, venv/, .env")
 
 def create_env_template():
     """Create a template .env file"""
@@ -239,30 +216,6 @@ def install_requirements_in_venv():
     except Exception as e:
         print_error(f"Failed to create requirements.txt: {str(e)}")
 
-def create_selected_models_json():
-    """Create selected_models.json if it doesn't exist"""
-    print_header("Setting up model configuration")
-    
-    if not os.path.exists("selected_models.json"):
-        models = [
-            "anthropic.claude-3-sonnet-20240229-v1:0",
-            "anthropic.claude-3-haiku-20240307-v1:0",
-            "anthropic.claude-3-opus-20240229-v1:0",
-            "anthropic.claude-3-5-sonnet-20240620-v1:0",
-            "us.amazon.nova-lite-v1:0",
-            "us.amazon.nova-v1:0"
-        ]
-        
-        try:
-            import json
-            with open("selected_models.json", "w", encoding="utf-8") as f:
-                json.dump(models, f, indent=2)
-            print_success("Created selected_models.json")
-        except Exception as e:
-            print_error(f"Failed to create selected_models.json: {str(e)}")
-    else:
-        print_warning("selected_models.json already exists, skipping")
-
 def create_activation_scripts():
     """Create activation scripts for the virtual environment"""
     print_header("Creating Activation Scripts")
@@ -286,6 +239,83 @@ def create_activation_scripts():
         os.chmod("activate.sh", 0o755)  # Make executable
         print_success("Created activate.sh for Unix/Linux/Mac")
 
+def generate_model_info():
+    """Generate model information files"""
+    print_header("Generating Model Information")
+    
+    try:
+        # Import here to avoid issues if it's not available
+        from model_manager import ModelManager
+        
+        manager = ModelManager()
+        
+        # Generate model_info.json
+        manager.save_model_info()
+        
+        # Generate vision_model_info.json
+        manager.save_vision_model_info()
+        
+        print_success("Generated model information files")
+        return True
+    except ImportError:
+        print_warning("Could not import ModelManager. Make sure to run this after installing requirements.")
+        print_warning("You can generate model information later by running: python model_manager.py")
+        return False
+    except Exception as e:
+        print_error(f"Error generating model information: {str(e)}")
+        print_warning("You can generate model information later by running: python model_manager.py")
+        return False
+
+def test_vision_models(limited_test=False):
+    """Test vision models for image processing capabilities"""
+    print_header("Testing Vision Models")
+    
+    try:
+        # Import here to avoid issues if it's not available
+        from model_tester import ModelTester
+        
+        tester = ModelTester()
+        
+        # Load models from vision_model_info.json
+        models = tester.load_models()
+        
+        if not models:
+            print_warning("No vision models found. Make sure to run model_manager.py first.")
+            return False
+        
+        print(f"Found {len(models)} vision models.")
+        
+        if limited_test:
+            # Test only Claude models for quick setup
+            claude_models = [m for m in models if "claude" in m.get("modelId", "").lower()]
+            if claude_models:
+                print(f"Testing {len(claude_models)} Claude models for quick setup...")
+                results = tester.test_models(claude_models)
+            else:
+                print_warning("No Claude models found. Testing first model only...")
+                results = tester.test_models([models[0]])
+        else:
+            # Test all models
+            print("Testing all vision models. This may take a while...")
+            results = tester.test_models(models)
+        
+        # Update vision_model_info.json with test results
+        tester.update_model_info(results)
+        
+        # Print summary
+        tester.print_summary(results)
+        
+        print_success("Vision model testing completed")
+        return True
+    except ImportError:
+        print_warning("Could not import ModelTester. Make sure to run this after installing requirements.")
+        print_warning("You can test vision models later by running: python model_tester.py")
+        return False
+    except Exception as e:
+        print_error(f"Error testing vision models: {str(e)}")
+        print_warning("You can test vision models later by running: python model_tester.py")
+        return False
+
 def main():
     """Main setup function"""
     print_header("Field Museum Bedrock Transcription App Setup")
@@ -298,7 +328,7 @@ def main():
             sys.exit(1)
     
     create_directories()
-    create_gitignore()
+    check_gitignore()
     create_env_template()
     
     # Ask user if they want to create a virtual environment
@@ -307,6 +337,30 @@ def main():
         if create_virtual_environment():
             install_requirements_in_venv()
             create_activation_scripts()
+            
+            # Ask if user wants to generate model information
+            generate_info = input(f"{Colors.BLUE}Do you want to generate model information now? (y/n): {Colors.ENDC}")
+            if generate_info.lower() == 'y':
+                # Activate the virtual environment and run the model manager
+                python_path = get_venv_python_path()
+                try:
+                    subprocess.run([python_path, "-m", "model_manager"], check=True)
+                    print_success("Generated model information")
+                    
+                    # Ask if user wants to test vision models
+                    test_models = input(f"{Colors.BLUE}Do you want to test vision models now? This may take some time. (y/n/quick): {Colors.ENDC}")
+                    if test_models.lower() == 'y':
+                        # Test all vision models
+                        subprocess.run([python_path, "-m", "model_tester"], check=True)
+                        print_success("Tested vision models")
+                    elif test_models.lower() == 'quick':
+                        # Test only Claude models for quick setup
+                        subprocess.run([python_path, "-c", "from model_tester import ModelTester; tester = ModelTester(); models = [m for m in tester.load_models() if 'claude' in m.get('modelId', '').lower()]; results = tester.test_models(models); tester.update_model_info(results); tester.print_summary(results)"], check=True)
+                        print_success("Tested Claude vision models")
+                except Exception as e:
+                    print_error(f"Error generating model information: {str(e)}")
+                    print_warning("You can generate model information later by running: python model_manager.py")
+                    print_warning("You can test vision models later by running: python model_tester.py")
     else:
         # Ask user if they want to install requirements globally
         install_req = input(f"{Colors.BLUE}Do you want to install Python requirements globally? (y/n): {Colors.ENDC}")
@@ -328,10 +382,28 @@ def main():
                     print_success(f"Installed {package}")
                 except Exception as e:
                     print_error(f"Error during installation of {package}: {str(e)}")
-    
-    # Import json here to avoid issues if it's not available
-    import json
-    create_selected_models_json()
+            
+            # Ask if user wants to generate model information
+            generate_info = input(f"{Colors.BLUE}Do you want to generate model information now? (y/n): {Colors.ENDC}")
+            if generate_info.lower() == 'y':
+                try:
+                    subprocess.run([sys.executable, "-m", "model_manager"], check=True)
+                    print_success("Generated model information")
+                    
+                    # Ask if user wants to test vision models
+                    test_models = input(f"{Colors.BLUE}Do you want to test vision models now? This may take some time. (y/n/quick): {Colors.ENDC}")
+                    if test_models.lower() == 'y':
+                        # Test all vision models
+                        subprocess.run([sys.executable, "-m", "model_tester"], check=True)
+                        print_success("Tested vision models")
+                    elif test_models.lower() == 'quick':
+                        # Test only Claude models for quick setup
+                        subprocess.run([sys.executable, "-c", "from model_tester import ModelTester; tester = ModelTester(); models = [m for m in tester.load_models() if 'claude' in m.get('modelId', '').lower()]; results = tester.test_models(models); tester.update_model_info(results); tester.print_summary(results)"], check=True)
+                        print_success("Tested Claude vision models")
+                except Exception as e:
+                    print_error(f"Error generating model information: {str(e)}")
+                    print_warning("You can generate model information later by running: python model_manager.py")
+                    print_warning("You can test vision models later by running: python model_tester.py")
     
     print_header("Setup Complete!")
     
@@ -351,7 +423,8 @@ To activate the virtual environment:
 After activating the virtual environment:
 1. Make sure to update your AWS credentials in the .env file
 2. Run the app with: {Colors.BOLD}streamlit run app.py{Colors.ENDC}
-3. Test image processing with: {Colors.BOLD}python models_image_test.py{Colors.ENDC}
+3. Generate model information: {Colors.BOLD}python model_manager.py{Colors.ENDC}
+4. Test vision models: {Colors.BOLD}python model_tester.py{Colors.ENDC}
 
 {Colors.BLUE}Happy transcribing!{Colors.ENDC}
 """)
@@ -362,7 +435,8 @@ After activating the virtual environment:
 To run the application:
 1. Make sure to update your AWS credentials in the .env file
 2. Run the app with: {Colors.BOLD}streamlit run app.py{Colors.ENDC}
-3. Test image processing with: {Colors.BOLD}python models_image_test.py{Colors.ENDC}
+3. Generate model information: {Colors.BOLD}python model_manager.py{Colors.ENDC}
+4. Test vision models: {Colors.BOLD}python model_tester.py{Colors.ENDC}
 
 {Colors.BLUE}Happy transcribing!{Colors.ENDC}
 """)

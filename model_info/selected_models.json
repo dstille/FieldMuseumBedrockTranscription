@@ -1,0 +1,42 @@
+[
+  {
+    "modelId": "amazon.nova-lite-v1:0",
+    "display_name": "Nova Lite (Amazon)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "amazon.nova-pro-v1:0",
+    "display_name": "Nova Pro (Amazon)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "amazon.nova-premier-v1:0",
+    "display_name": "Nova Premier (Amazon)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "display_name": "Claude 3 Sonnet (Anthropic)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
+    "display_name": "Claude 3 Haiku (Anthropic)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    "display_name": "Claude 3.5 Sonnet (Anthropic)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "display_name": "Claude 3.5 Sonnet v2 (Anthropic)",
+    "image_test_success": true
+  },
+  {
+    "modelId": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+    "display_name": "Claude 3.7 Sonnet (Anthropic)",
+    "image_test_success": true
+  }
+]

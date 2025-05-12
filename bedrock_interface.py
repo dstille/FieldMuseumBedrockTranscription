@@ -1,371 +1,410 @@
-"""
-Bedrock interface for image processing.
-This module contains the processor for AWS Bedrock models.
-"""
-
+import boto3
+import base64
 import json
 import time
 import os
-import re
-import base64
-import boto3
+from typing import Dict, Any, Tuple, Optional
+from botocore.exceptions import ClientError
+from llm_interface import ImageProcessor
+from utilities.base64_filter import filter_base64, filter_base64_from_dict
 
-class BedrockImageProcessor:
-    """Processor for AWS Bedrock models."""
-    
-    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, accept_non_json=False):
-        """
-        Initialize the Bedrock image processor.
-        
-        Args:
-            api_key: API key (not used for AWS Bedrock, but kept for compatibility)
-            prompt_name: Name of the prompt
-            prompt_text: Text of the prompt
-            model: Model ID
-            modelname: Display name of the model
-            accept_non_json: Whether to accept non-JSON responses
-        """
-        self.raw_response_folder = "raw_llm_responses"
-        self.ensure_directory_exists(self.raw_response_folder)
-        self.api_key = api_key.strip()
-        self.prompt_name = prompt_name
-        self.prompt_text = prompt_text
-        self.model = model
-        self.modelname = modelname
-        self.input_tokens = 0
-        self.output_tokens = 0
+class BedrockImageProcessor(ImageProcessor):
+    def __init__(self, api_key, prompt_name, prompt_text, model, modelname):
+        super().__init__(api_key, prompt_name, prompt_text, model, modelname)
+        self.bedrock_client = boto3.client("bedrock-runtime")
+        self.bedrock_mgmt = boto3.client("bedrock")
+        self.model_info = None
+        self.account_id = self._get_account_id()
         self.set_token_costs_per_mil()
-        self.num_processed = 0
-        self.bedrock_client = self._initialize_bedrock_client()
-        self.accept_non_json = accept_non_json
-        
-    def _initialize_bedrock_client(self):
-        """Initialize the Bedrock client with configuration"""
-        return boto3.client(
-            'bedrock-runtime',
-            region_name=os.getenv('AWS_REGION', 'us-east-1'),
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
-        )
     
-    def ensure_directory_exists(self, directory):
-        """Create a directory if it doesn't exist."""
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-    
-    def get_timestamp(self):
-        """Get a formatted timestamp."""
-        return time.strftime("%Y-%m-%d-%H%M-%S")
+    def _get_account_id(self) -> str:
+        """Get the AWS account ID."""
+        try:
+            sts_client = boto3.client('sts')
+            return sts_client.get_caller_identity()["Account"]
+        except Exception as e:
+            print(f"Error getting AWS account ID: {str(e)}")
+            return ""
     
     def set_token_costs_per_mil(self):
-        """Set token costs per million tokens."""
-        # Set costs based on model
-        model_costs = {
-            "anthropic.claude-3": {"input": 15.0, "output": 75.0},
-            "anthropic.claude-3-5": {"input": 3.0, "output": 15.0},
-            "anthropic.claude-3-7": {"input": 5.0, "output": 15.0},
-            "anthropic.claude-2": {"input": 8.0, "output": 24.0},
-            "meta.llama3": {"input": 0.7, "output": 0.9},
-            "meta.llama4": {"input": 1.0, "output": 3.0},
-            "mistral.mistral": {"input": 0.5, "output": 1.5},
-            "mistral.mixtral": {"input": 0.6, "output": 1.8},
-            "cohere.command": {"input": 1.0, "output": 2.0},
-            "ai21.jamba": {"input": 1.5, "output": 2.0},
-            "amazon.titan": {"input": 0.2, "output": 0.3},
-            "amazon.nova": {"input": 0.2, "output": 0.3},
-            "us.amazon.nova": {"input": 0.2, "output": 0.3}
-        }
+        """Set token costs based on the model provider."""
+        provider = self.model.split(".")[0] if "." in self.model else ""
         
-        # Find the matching model family
-        model_family = None
-        for family in model_costs:
-            if family in self.model:
-                model_family = family
-                break
+        # Default costs
+        self.input_cost_per_mil = 1.0
+        self.output_cost_per_mil = 2.0
         
-        costs = model_costs.get(model_family, {"input": 0, "output": 0})
-        self.input_cost_per_mil = costs["input"]
-        self.output_cost_per_mil = costs["output"]
+        # Provider-specific costs
+        if provider == "anthropic":
+            self.input_cost_per_mil = 8.0
+            self.output_cost_per_mil = 24.0
+        elif provider == "amazon":
+            self.input_cost_per_mil = 0.8
+            self.output_cost_per_mil = 1.6
+        elif provider == "mistral":
+            self.input_cost_per_mil = 7.0
+            self.output_cost_per_mil = 20.0
+        elif provider == "meta":
+            self.input_cost_per_mil = 6.0
+            self.output_cost_per_mil = 6.0
     
-    def get_token_costs(self):
-        """Calculate token costs."""
-        return {
-            "input tokens": self.input_tokens,
-            "output tokens": self.output_tokens,
-            "input cost $": round((self.input_tokens / 1_000_000) * self.input_cost_per_mil, 3),
-            "output cost $": round((self.output_tokens / 1_000_000) * self.output_cost_per_mil, 3)
-        }
+    def supports_image_processing(self) -> bool:
+        """Check if the selected model supports image processing."""
+        # Load model info if not already loaded
+        if not self.model_info:
+            self.model_info = self.load_model_info()
+        
+        # Check if the model is in our image models list
+        return self.model_info is not None
     
-    def get_transcript_processing_data(self, time_elapsed):
-        """Get processing data for the transcript."""
-        return {
-            "time to create/edit (mins)": time_elapsed,
-        } | self.get_token_costs()
-    
-    def save_raw_response(self, response_data, image_name):
-        """Save the raw response to a file."""
-        directory = f"{self.raw_response_folder}/{self.modelname}"
-        self.ensure_directory_exists(directory)
-        filename = f"{directory}/{image_name}-{self.get_timestamp()}-raw.json"
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(response_data, f, ensure_ascii=False, indent=4)
-    
-    def _extract_json_from_text(self, text):
-        """
-        Extract JSON from text response.
-        Handles cases where the model might include text before or after the JSON.
-        """
+    def load_model_info(self) -> Dict[str, Any]:
+        """Load model information from vision_model_info.json."""
         try:
-            # First try to parse the entire text as JSON
-            return json.loads(text)
-        except json.JSONDecodeError:
-            # If that fails, try to extract JSON using regex
-            json_pattern = r'(\{[\s\S]*\}|\[[\s\S]*\])'
-            match = re.search(json_pattern, text)
-            if match:
-                try:
-                    return json.loads(match.group(0))
-                except json.JSONDecodeError:
-                    pass
-            
-            # If all else fails, return the original text as a JSON object
-            if self.accept_non_json:
-                return {"raw_text": text}
-            else:
-                return {"raw_text": text, "error": "Could not parse as JSON"}
+            # Try to load from model_info directory first
+            try:
+                with open("model_info/vision_model_info.json", "r") as f:
+                    models = json.load(f)
+                    for model in models:
+                        if model.get("modelId") == self.model:
+                            return model
+                    return None
+            except FileNotFoundError:
+                # Fall back to root directory
+                with open("vision_model_info.json", "r") as f:
+                    models = json.load(f)
+                    for model in models:
+                        if model.get("modelId") == self.model:
+                            return model
+                    return None
+        except Exception as e:
+            print(f"Error loading model info: {str(e)}")
+            return None
     
-    @staticmethod
-    def get_verified_image_models():
-        """
-        Get a list of models that have been verified to work with images.
-        This list is based on testing results and official documentation.
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt based on the model provider."""
+        # Default implementation for models that don't have a specific formatter
+        # Add a request for JSON output to the prompt text if not already present
+        prompt_text = self.prompt_text
+        if "json" not in prompt_text.lower():
+            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field."
         
-        Returns:
-            A list of model IDs that support image processing
-        """
-        return [
-            # Anthropic Claude models
-            "anthropic.claude-3-sonnet-20240229-v1:0",
-            "anthropic.claude-3-haiku-20240307-v1:0",
-            "anthropic.claude-3-opus-20240229-v1:0",
-            "anthropic.claude-3-5-sonnet-20240620-v1:0",
-            "anthropic.claude-3-7-sonnet-20250219-v1:0",
-            
-            # Amazon Nova models
-            "us.amazon.nova-lite-v1:0",
-            "us.amazon.nova-v1:0",
-            "amazon.nova-lite-v1:0",
-            "amazon.nova-v1:0",
-            
-            # Meta Llama models
-            "meta.llama4-scout-17b-instruct-v1:0",
-            "meta.llama4-maverick-17b-instruct-v1:0",
-            
-            # Mistral models
-            "mistral.pixtral-large-2502-v1:0"
-        ]
+        # Generic format that works with most models
+        return {
+            "inputText": prompt_text,
+            "inputImage": base64_image,
+            "textGenerationConfig": {
+                "maxTokenCount": 4096,
+                "temperature": 0.7,
+                "topP": 0.9
+            }
+        }
     
-    @staticmethod
-    def is_model_image_capable(model_id):
-        """
-        Check if a model supports image processing.
-        
-        Args:
-            model_id: The model ID to check
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from response."""
+        # Default implementation for models that don't have a specific extractor
+        # Try common response formats
+        try:
+            # Check for common response structures
+            if "content" in response_body and isinstance(response_body["content"], list):
+                # Claude-like format
+                for item in response_body["content"]:
+                    if isinstance(item, dict) and "text" in item:
+                        return item.get("text", "")
             
-        Returns:
-            True if the model supports image processing, False otherwise
-        """
-        # List of model families that support image processing
-        image_capable_families = [
-            "anthropic.claude-3",  # All Claude 3 models
-            "anthropic.claude-3-5", # Claude 3.5 models
-            "anthropic.claude-3-7", # Claude 3.7 models
-            "meta.llama4",  # Llama 4 models with vision
-            "mistral.pixtral",  # Mistral's vision model
-            "amazon.titan-image",  # Amazon Titan image models
-            "amazon.nova",  # Amazon Nova models
-            "us.amazon.nova"  # US Amazon Nova models
-        ]
-        
-        # Get the list of verified image-capable models
-        verified_models = BedrockImageProcessor.get_verified_image_models()
-        
-        # Check if the model is in the verified list
-        if model_id in verified_models:
-            return True
-        
-        # Check if the model belongs to a known image-capable family
-        for family in image_capable_families:
-            if family in model_id:
-                return True
-        
-        return False
-    
-    def supports_image_processing(self):
-        """Check if the model supports image processing."""
-        return BedrockImageProcessor.is_model_image_capable(self.model)
-    
-    def process_image(self, base64_image, image_ref, index):
-        """
-        Process an image with the model.
-        
-        Args:
-            base64_image: Base64-encoded image data
-            image_ref: Reference to the image (e.g., filename)
-            index: Index of the image in a batch
+            elif "output" in response_body:
+                # Nova-like format
+                output = response_body["output"]
+                if isinstance(output, dict) and "message" in output:
+                    message = output["message"]
+                    if isinstance(message, dict) and "content" in message:
+                        for item in message["content"]:
+                            if isinstance(item, dict) and "text" in item:
+                                return item.get("text", "")
             
-        Returns:
-            Tuple of (content, processing_data)
-        """
+            elif "results" in response_body and isinstance(response_body["results"], list):
+                # Amazon-like format
+                return response_body["results"][0].get("outputText", "")
+            
+            elif "generation" in response_body:
+                # Meta-like format
+                return response_body.get("generation", "")
+            
+            elif "text" in response_body:
+                # Simple format
+                return response_body.get("text", "")
+            
+            # If we can't find a known structure, convert the whole response to a string
+            return json.dumps(response_body)
+        
+        except Exception as e:
+            print(f"Error extracting text from response: {str(e)}")
+            return f"Error extracting text: {str(e)}"
+    
+    def needs_inference_profile(self) -> bool:
+        """Check if the model requires an inference profile."""
+        if not self.model_info:
+            return False
+        
+        inference_types = self.model_info.get("inferenceTypes", [])
+        return "INFERENCE_PROFILE" in inference_types and "ON_DEMAND" not in inference_types
+    
+    def get_inference_profile_id(self) -> str:
+        """Get the inference profile ID for the model."""
+        # For models that require inference profiles, construct the ARN
+        if self.needs_inference_profile() and self.account_id:
+            # Extract region from the client configuration
+            region = self.bedrock_client.meta.region_name
+            region_prefix = region.split('-')[0]  # e.g., "us" from "us-east-1"
+            
+            # Get provider from model ID
+            provider = self.model.split('.')[0] if '.' in self.model else ""
+            
+            # Construct the inference profile ARN with region prefix
+            # Format: arn:aws:bedrock:{region}:{account_id}:inference-profile/{region_prefix}.{model_id}
+            return f"arn:aws:bedrock:{region}:{self.account_id}:inference-profile/{region_prefix}.{self.model}"
+        
+        return self.model
+    
+    def process_image(self, base64_image: str, image_name: str, image_index: int) -> Tuple[str, Dict[str, Any]]:
+        """Process an image with the selected model and return the transcription."""
+        if not self.supports_image_processing():
+            raise ValueError(f"Model {self.model} does not support image processing")
+        
         start_time = time.time()
+        
+        # Format the prompt
+        request_body = self.format_prompt(base64_image)
+        
+        # Get provider from model ID
+        provider = self.model.split(".")[0] if "." in self.model else ""
+        
+        # Process differently based on provider
         try:
-            # Check if the model supports image processing
-            if not self.supports_image_processing():
-                error_message = f"Model {self.model} does not support image processing"
-                print(f"WARNING: {error_message}")
-                # If we're testing all models, continue anyway
-                if not self.accept_non_json:
-                    return error_message, None
-            
-            # Format the prompt based on the model
-            request_body = self._format_prompt(base64_image)
-            
-            # Debug the request body
-            print(f"Using model: {self.model}")
-            
-            # Invoke the model
+            # Check if we need to use an inference profile
+            if self.needs_inference_profile():
+                print(f"Using inference profile for model {self.model}")
+                if provider == "meta":
+                    # For Meta models with inference profiles, use SageMaker Runtime
+                    return self._process_with_sagemaker(request_body, base64_image, image_name, start_time)
+                else:
+                    # For other models with inference profiles, use Bedrock with profile ARN
+                    return self._process_with_bedrock(request_body, base64_image, image_name, start_time)
+            else:
+                # For models without inference profiles, use standard Bedrock
+                return self._process_with_bedrock(request_body, base64_image, image_name, start_time)
+                
+        except Exception as e:
+            error_message = f"Error processing image: {str(e)}"
+            print(error_message)
+            return error_message, {"error": error_message}
+    
+    def _process_with_bedrock(self, request_body: Dict[str, Any], base64_image: str, 
+                             image_name: str, start_time: float) -> Tuple[str, Dict[str, Any]]:
+        """Process an image using the Bedrock client."""
+        # Determine if we need to use an inference profile
+        model_id = self.get_inference_profile_id()
+        
+        # Invoke the model
+        print(f"Invoking model with ID: {model_id}")
+        try:
             response = self.bedrock_client.invoke_model(
-                modelId=self.model,
+                modelId=model_id,
                 body=json.dumps(request_body)
             )
             
-            response_body = json.loads(response.get('body').read())
-            self.save_raw_response(response_body, image_ref)
+            response_body = json.loads(response.get("body").read())
             
-            # Update usage based on response
-            if 'usage' in response_body:
-                self.update_usage(response_body)
+            # Save raw response
+            self.save_raw_response(response_body, image_name)
             
-            end_time = time.time()
-            elapsed_time = (end_time - start_time) / 60
+            # Extract text from response
+            text = self.extract_text(response_body)
             
-            content = self.get_content_from_response(response_body)
+            # Update token usage if available
+            self.update_usage(response_body)
             
-            # Try to parse the content as JSON
-            json_content = self._extract_json_from_text(content)
+            # Calculate processing time
+            time_elapsed = (time.time() - start_time) / 60  # in minutes
+            processing_data = self.get_transcript_processing_data(time_elapsed)
             
-            # Return the JSON string
-            return json.dumps(json_content, indent=2, ensure_ascii=False), self.get_transcript_processing_data(elapsed_time)
+            self.num_processed += 1
             
+            return text, processing_data
         except Exception as e:
-            error_message = (
-                f"Error processing image {index + 1} image '{image_ref}':\n {str(e)}"
-            )
-            print(f"ERROR: {error_message}")
-            return error_message, None
+            error_message = f"Error invoking model {model_id}: {str(e)}"
+            print(error_message)
+            
+            # Add more context to the error message
+            if "AccessDeniedException" in str(e):
+                error_message += "\nAccess denied: You may not have permissions to use this model or inference profile."
+            elif "ValidationException" in str(e) and "inference profile" in str(e).lower():
+                error_message += "\nInference profile error: The inference profile may not be set up correctly."
+            elif "ResourceNotFoundException" in str(e):
+                error_message += "\nResource not found: The model or inference profile may not exist."
+            
+            return error_message, {"error": error_message}
     
-    def _format_prompt(self, base64_image):
-        """Format the prompt based on the model being used"""
-        # Create a JSON instruction that asks for JSON output
-        json_instruction = "Return your response as a valid JSON object with fields matching the requested information. Do not include any text outside the JSON structure."
+    def _process_with_sagemaker(self, request_body: Dict[str, Any], base64_image: str, 
+                               image_name: str, start_time: float) -> Tuple[str, Dict[str, Any]]:
+        """Process an image using the SageMaker Runtime client."""
+        # Initialize SageMaker Runtime client
+        sagemaker_runtime = boto3.client('sagemaker-runtime')
         
-        # Build a structured prompt text
-        structured_prompt = f"{self.prompt_text}\n\n{json_instruction}\n\nPlease provide the information in JSON format."
+        # Create a valid endpoint name by replacing invalid characters
+        # SageMaker endpoint names must match: ^[a-zA-Z0-9](-*[a-zA-Z0-9])*
+        model_id_clean = self.model.replace(".", "-").replace(":", "-")
+        endpoint_name = f"llama-{model_id_clean}"
         
-        # Anthropic Claude 3.5 models (different format)
-        if "anthropic.claude-3-5" in self.model:
-            return {
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 4096,
-                "temperature": 0,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": structured_prompt
-                            },
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/jpeg",
-                                    "data": base64_image
-                                }
-                            }
-                        ]
-                    }
-                ]
-                # Note: No response_format for Claude 3.5
-            }
+        print(f"Invoking SageMaker endpoint: {endpoint_name}")
         
-        # Anthropic Claude 3.7 models (may have different format)
-        elif "anthropic.claude-3-7" in self.model:
-            return {
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 4096,
-                "temperature": 0,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": structured_prompt
-                            },
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/jpeg",
-                                    "data": base64_image
-                                }
-                            }
-                        ]
-                    }
-                ]
-                # Note: No response_format for Claude 3.7 (similar to 3.5)
-            }
-        
-        # Anthropic Claude 3 models (original versions)
-        elif "anthropic.claude-3" in self.model:
-            return {
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 4096,
-                "temperature": 0,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": structured_prompt
-                            },
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/jpeg",
-                                    "data": base64_image
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "response_format": {"type": "json_object"}
-            }
-        
-        # Amazon Nova models
-        elif "amazon.nova" in self.model or "us.amazon.nova" in self.model:
-            # Define system prompt
-            system_list = [{
-                "text": structured_prompt
-            }]
+        try:
+            # Invoke the endpoint
+            response = sagemaker_runtime.invoke_endpoint(
+                EndpointName=endpoint_name,
+                ContentType='application/json',
+                Body=json.dumps(request_body)
+            )
+            
+            # Process the response
+            response_body = json.loads(response['Body'].read())
+            
+            # Save raw response
+            self.save_raw_response(response_body, image_name)
+            
+            # Extract text from response
+            text = self.extract_text(response_body)
+            
+            # Update token usage if available
+            self.update_usage(response_body)
+            
+            # Calculate processing time
+            time_elapsed = (time.time() - start_time) / 60  # in minutes
+            processing_data = self.get_transcript_processing_data(time_elapsed)
+            
+            self.num_processed += 1
+            
+            return text, processing_data
+        except Exception as e:
+            error_message = f"Error invoking SageMaker endpoint {endpoint_name}: {str(e)}"
+            print(error_message)
+            
+            # Add more context to the error message
+            if "ValidationError" in str(e) and "not found" in str(e):
+                error_message += "\nEndpoint not found: The SageMaker endpoint may not be set up for this model."
+                error_message += "\nTo use this model, you need to set up a SageMaker endpoint with the name format: llama-{model-id}"
+            elif "AccessDeniedException" in str(e):
+                error_message += "\nAccess denied: You may not have permissions to use this SageMaker endpoint."
+            
+            return error_message, {"error": error_message}
+    
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from response data."""
+        # Default implementation for models that don't have a specific usage extractor
+        try:
+            # Check for common usage structures
+            if "usage" in response_data:
+                usage = response_data["usage"]
+                
+                # Try different key formats
+                if "input_tokens" in usage:
+                    self.input_tokens = usage.get("input_tokens", 0)
+                elif "inputTokens" in usage:
+                    self.input_tokens = usage.get("inputTokens", 0)
+                elif "prompt_tokens" in usage:
+                    self.input_tokens = usage.get("prompt_tokens", 0)
+                elif "inputTokenCount" in usage:
+                    self.input_tokens = usage.get("inputTokenCount", 0)
+                
+                if "output_tokens" in usage:
+                    self.output_tokens = usage.get("output_tokens", 0)
+                elif "outputTokens" in usage:
+                    self.output_tokens = usage.get("outputTokens", 0)
+                elif "completion_tokens" in usage:
+                    self.output_tokens = usage.get("completion_tokens", 0)
+                elif "outputTokenCount" in usage:
+                    self.output_tokens = usage.get("outputTokenCount", 0)
+        except Exception as e:
+            print(f"Error updating usage: {str(e)}")
 
-            # Define message list
-            message_list = [{
+
+class ClaudeImageProcessor(BedrockImageProcessor):
+    """Specialized processor for Claude models."""
+    
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt for Claude models."""
+        # Add a request for JSON output to the prompt text if not already present
+        prompt_text = self.prompt_text
+        if "json" not in prompt_text.lower():
+            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field."
+        
+        return {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 4096,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": base64_image
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "text": prompt_text
+                        }
+                    ]
+                }
+            ]
+        }
+    
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from Claude response data."""
+        usage = response_data.get("usage", {})
+        self.input_tokens = usage.get("input_tokens", 0)
+        self.output_tokens = usage.get("output_tokens", 0)
+    
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from Claude response."""
+        content = response_body.get("content", [])
+        text = next((item.get("text", "") for item in content if item.get("type") == "text"), "")
+        
+        # Try to extract JSON from the text if it contains JSON markers
+        if "{" in text and "}" in text:
+            try:
+                # Find JSON content between curly braces
+                import re
+                json_match = re.search(r'(\{.*\})', text, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(1)
+                    # Validate it's proper JSON by parsing it
+                    json.loads(json_str)
+                    # If successful, return just the JSON part
+                    return json_str
+            except json.JSONDecodeError:
+                # If JSON parsing fails, return the full text
+                pass
+        
+        return text
+
+
+class NovaImageProcessor(BedrockImageProcessor):
+    """Specialized processor for Amazon Nova models."""
+    
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt for Nova models."""
+        # Add a request for JSON output to the prompt text if not already present
+        prompt_text = self.prompt_text
+        if "json" not in prompt_text.lower():
+            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field."
+        
+        # Based on debug_nova.py results, format 1 works for Nova models
+        return {
+            "schemaVersion": "messages-v1",
+            "messages": [{
                 "role": "user",
                 "content": [
                     {
@@ -375,99 +414,167 @@ class BedrockImageProcessor:
                         }
                     },
                     {
-                        "text": "Analyze this image and provide the requested information in JSON format."
+                        "text": prompt_text
                     }
                 ],
-            }]
-
-            # Configure inference parameters
-            inf_params = {"max_new_tokens": 4096, "top_p": 0.1, "top_k": 20, "temperature": 0}
-
-            return {
-                "schemaVersion": "messages-v1",
-                "messages": message_list,
-                "system": system_list,
-                "inferenceConfig": inf_params,
-            }
-        
-        # Meta Llama 4 models (vision capable)
-        elif "meta.llama4" in self.model:
-            return {
-                "prompt": f"{structured_prompt}\n[IMAGE]{base64_image}[/IMAGE]",
-                "max_gen_len": 4096,
-                "temperature": 0,
-                "top_p": 0.9,
-                "response_format": {"type": "json_object"}
-            }
-        
-        # Mistral Pixtral models
-        elif "mistral.pixtral" in self.model:
-            return {
-                "prompt": f"<s>[INST] {structured_prompt} [/INST]",
-                "max_tokens": 4096,
-                "temperature": 0,
-                "top_p": 0.9,
-                "images": [base64_image]
-            }
-        
-        # Default format for text-only models - just send the prompt without the image
-        return {
-            "prompt": structured_prompt,
-            "max_tokens": 4096,
-            "temperature": 0
+            }],
+            "inferenceConfig": {"max_new_tokens": 4096, "top_p": 0.9, "temperature": 0.7}
         }
     
-    def get_content_from_response(self, response_body):
-        """Extract content from response based on model"""
-        # Anthropic Claude models
-        if "anthropic.claude" in self.model:
-            return response_body.get("content", [{}])[0].get("text", "")
-        
-        # Amazon Nova models
-        elif "amazon.nova" in self.model or "us.amazon.nova" in self.model:
-            return response_body.get("output", {}).get("message", {}).get("content", [{}])[0].get("text", "")
-        
-        # Meta Llama models
-        elif "meta.llama" in self.model:
-            return response_body.get("generation", "")
-        
-        # Mistral models
-        elif "mistral." in self.model:
-            return response_body.get("outputs", [{}])[0].get("text", "")
-        
-        # AI21 models
-        elif "ai21." in self.model:
-            return response_body.get("completions", [{}])[0].get("data", {}).get("text", "")
-        
-        # Cohere models
-        elif "cohere." in self.model:
-            return response_body.get("text", "")
-        
-        # Amazon Titan models
-        elif "amazon.titan" in self.model:
-            return response_body.get("results", [{}])[0].get("outputText", "")
-        
-        # Default - try to extract any text content
-        for key, value in response_body.items():
-            if isinstance(value, str) and value:
-                return value
-        
-        # If all else fails, return the entire response as a string
-        return json.dumps(response_body)
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from Nova response data."""
+        usage = response_data.get("usage", {})
+        self.input_tokens = usage.get("inputTokens", 0)
+        self.output_tokens = usage.get("outputTokens", 0)
     
-    def update_usage(self, response_data):
-        """Update token usage from response"""
-        if 'usage' in response_data:
-            usage = response_data['usage']
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from Nova response."""
+        try:
+            # Try to extract from the output.message.content structure
+            if "output" in response_body and "message" in response_body["output"]:
+                message = response_body["output"]["message"]
+                if "content" in message and isinstance(message["content"], list):
+                    for item in message["content"]:
+                        if isinstance(item, dict) and "text" in item:
+                            return item["text"]
             
-            # Different models use different field names for token counts
-            input_tokens = usage.get('input_tokens', 
-                           usage.get('prompt_tokens',
-                           usage.get('inputTokenCount', 0)))
-            
-            output_tokens = usage.get('output_tokens',
-                            usage.get('completion_tokens',
-                            usage.get('outputTokenCount', 0)))
-            
-            self.input_tokens += input_tokens
-            self.output_tokens += output_tokens
+            # Fall back to old format
+            return response_body.get("results", [{}])[0].get("outputText", "")
+        except Exception as e:
+            # Import base64_filter here to avoid circular imports
+            from utilities.base64_filter import filter_base64
+            filtered_response = filter_base64(str(response_body))
+            print(f"Error extracting text from Nova response: {str(e)}")
+            return f"Error parsing response: {filtered_response[:500]}"
+
+
+class AmazonImageProcessor(BedrockImageProcessor):
+    """Specialized processor for other Amazon models (Titan, etc.)."""
+    
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt for Amazon models."""
+        return {
+            "inputText": self.prompt_text,
+            "inputImage": base64_image,
+            "textGenerationConfig": {
+                "maxTokenCount": 4096,
+                "temperature": 0.7,
+                "topP": 0.9
+            }
+        }
+    
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from Amazon response data."""
+        usage = response_data.get("usage", {})
+        self.input_tokens = usage.get("inputTokenCount", 0)
+        self.output_tokens = usage.get("outputTokenCount", 0)
+    
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from Amazon response."""
+        return response_body.get("results", [{}])[0].get("outputText", "")
+
+
+class MetaImageProcessor(BedrockImageProcessor):
+    """Specialized processor for Meta models."""
+    
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt for Meta models."""
+        return {
+            "prompt": self.prompt_text,
+            "image": base64_image
+        }
+    
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from Meta response data."""
+        usage = response_data.get("usage", {})
+        self.input_tokens = usage.get("input_tokens", 0)
+        self.output_tokens = usage.get("output_tokens", 0)
+    
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from Meta response."""
+        return response_body.get("generation", "") or response_body.get("text", "")
+    
+    def process_image(self, base64_image: str, image_name: str, image_index: int) -> Tuple[str, Dict[str, Any]]:
+        """Process an image with Meta model using SageMaker."""
+        if not self.supports_image_processing():
+            raise ValueError(f"Model {self.model} does not support image processing")
+        
+        start_time = time.time()
+        
+        # Format the prompt
+        request_body = self.format_prompt(base64_image)
+        
+        # Use SageMaker for Meta models
+        return self._process_with_sagemaker(request_body, base64_image, image_name, start_time)
+
+
+class MistralImageProcessor(BedrockImageProcessor):
+    """Specialized processor for Mistral models."""
+    
+    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+        """Format the prompt for Mistral models."""
+        return {
+            "prompt": self.prompt_text,
+            "image": base64_image,
+            "max_tokens": 4096
+        }
+    
+    def update_usage(self, response_data: Dict[str, Any]):
+        """Update token usage from Mistral response data."""
+        usage = response_data.get("usage", {})
+        self.input_tokens = usage.get("prompt_tokens", 0)
+        self.output_tokens = usage.get("completion_tokens", 0)
+    
+    def extract_text(self, response_body: Dict[str, Any]) -> str:
+        """Extract text from Mistral response."""
+        return response_body.get("outputs", [{}])[0].get("text", "")
+
+
+# Factory function to create the appropriate processor
+def create_image_processor(api_key, prompt_name, prompt_text, model, modelname):
+    """Create the appropriate image processor based on the model."""
+    provider = model.split(".")[0] if "." in model else ""
+    
+    # Load model info to check if it has an inference profile
+    model_info = None
+    try:
+        # Try to load from model_info directory first
+        try:
+            with open("model_info/vision_model_info.json", "r") as f:
+                models = json.load(f)
+                for m in models:
+                    if m.get("modelId") == model:
+                        model_info = m
+                        break
+        except FileNotFoundError:
+            # Fall back to root directory
+            with open("vision_model_info.json", "r") as f:
+                models = json.load(f)
+                for m in models:
+                    if m.get("modelId") == model:
+                        model_info = m
+                        break
+    except Exception as e:
+        print(f"Error loading model info: {str(e)}")
+    
+    # Create the appropriate processor based on provider
+    try:
+        if provider == "anthropic":
+            return ClaudeImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+        elif provider == "meta":
+            return MetaImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+        elif provider == "mistral":
+            return MistralImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+        elif provider == "amazon":
+            if "nova" in model.lower():
+                return NovaImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+            else:
+                return AmazonImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+        else:
+            # Default to base class for other providers
+            print(f"Using default processor for model: {model} (provider: {provider})")
+            return BedrockImageProcessor(api_key, prompt_name, prompt_text, model, modelname)
+    except Exception as e:
+        print(f"Error creating processor for model {model}: {str(e)}")
+        # Fallback to base class if there's an error
+        return BedrockImageProcessor(api_key, prompt_name, prompt_text, model, modelname)

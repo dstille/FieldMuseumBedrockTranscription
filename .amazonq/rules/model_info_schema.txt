@@ -1,0 +1,11 @@
+information about models should follow the following schema
+
+{
+    full_model_name: {
+        is_available: False,
+        is_selected: False,
+        is_image_capable: False,
+        cross_region_inference_profile: None,
+    }
+
+}

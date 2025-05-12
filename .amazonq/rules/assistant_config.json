@@ -1,0 +1,93 @@
+{
+  "version": "1.0",
+  "assistant_preferences": {
+    "code_style": {
+      "language_preferences": {
+        "python": {
+          "indentation": "spaces",
+          "indent_size": 4,
+          "docstring_style": "google",
+          "line_length": 88,
+          "imports_style": "grouped",
+          "quote_style": "double",
+          "include_docstrings": false
+        },
+        "javascript": {
+          "indentation": "spaces",
+          "indent_size": 2,
+          "semicolons": true,
+          "quote_style": "single"
+        }
+      },
+      "general": {
+        "prefer_explicit_typing": true,
+        "include_comments": false,
+        "comment_density": "minimal",
+        "function_style": {
+          "prefer_short_functions": true,
+          "descriptive_naming": true,
+          "max_function_length": 25,
+          "self_documenting_code": true
+        }
+      }
+    },
+    "response_format": {
+      "provide_multiple_approaches": true,
+      "explain_before_implementation": true,
+      "include_references": true,
+      "code_block_format": "with_language_tag"
+    },
+    "error_handling": {
+      "verbosity": "minimal",
+      "include_try_catch": false,
+      "validate_inputs": false,
+      "development_phase": {
+        "prototype": {
+          "error_handling_level": "minimal"
+        },
+        "pre_commit": {
+          "error_handling_level": "comprehensive"
+        }
+      }
+    },
+    "security_practices": {
+      "sanitize_user_inputs": true,
+      "avoid_hardcoded_credentials": true,
+      "suggest_least_privilege": true,
+      "highlight_security_concerns": true
+    },
+    "performance_considerations": {
+      "suggest_optimizations": true,
+      "consider_memory_usage": true,
+      "consider_time_complexity": true
+    }
+  },
+  "project_context": {
+    "frameworks": ["streamlit", "aws-bedrock"],
+    "primary_languages": ["python"],
+    "testing_framework": "pytest",
+    "deployment_environment": "aws",
+    "project_type": "data_processing",
+    "development_phase": {
+      "current_phase": "prototype",
+      "documentation_strategy": {
+        "prototype": {
+          "include_documentation": false,
+          "include_docstrings": false,
+          "include_readme": false
+        },
+        "pre_commit": {
+          "include_documentation": true,
+          "include_docstrings": true,
+          "include_readme": true
+        }
+      }
+    }
+  },
+  "interaction_preferences": {
+    "verbosity": "balanced",
+    "code_to_explanation_ratio": "more_code",
+    "follow_up_suggestions": true,
+    "include_references_to_documentation": true
+  }
+}

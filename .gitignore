@@ -3,6 +3,11 @@ temp_images/
 transcriptions/
 raw_llm_responses/
 logs/
+data/
+debug_results/
+testing_archive/
+test_results/
+images_to_upload/
 
 # Environment variables
 .env
@@ -31,3 +36,7 @@ ENV/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Project specific files
+instructions.txt
+letter.txt
