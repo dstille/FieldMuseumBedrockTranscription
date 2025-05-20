@@ -808,54 +808,6 @@
     "on_demand_supported": true
   },
   {
-    "modelId": "stability.stable-diffusion-xl-v1:0",
-    "modelName": "SDXL 1.0",
-    "provider": "Stability AI",
-    "supports_image": true,
-    "input_modalities": [
-      "TEXT",
-      "IMAGE"
-    ],
-    "output_modalities": [
-      "IMAGE"
-    ],
-    "streaming_supported": false,
-    "lifecycle_status": "LEGACY",
-    "inferenceTypes": [
-      "PROVISIONED"
-    ],
-    "pricing": {
-      "input": 0.0,
-      "output": 0.0
-    },
-    "use_inference_profile": false,
-    "on_demand_supported": false
-  },
-  {
-    "modelId": "stability.stable-diffusion-xl-v1",
-    "modelName": "SDXL 1.0",
-    "provider": "Stability AI",
-    "supports_image": true,
-    "input_modalities": [
-      "TEXT",
-      "IMAGE"
-    ],
-    "output_modalities": [
-      "IMAGE"
-    ],
-    "streaming_supported": false,
-    "lifecycle_status": "LEGACY",
-    "inferenceTypes": [
-      "ON_DEMAND"
-    ],
-    "pricing": {
-      "input": 0.0,
-      "output": 0.0
-    },
-    "use_inference_profile": false,
-    "on_demand_supported": true
-  },
-  {
     "modelId": "ai21.jamba-instruct-v1:0",
     "modelName": "Jamba-Instruct",
     "provider": "AI21 Labs",
@@ -2004,24 +1956,17 @@
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0:1m",
-    "modelName": "Llama 4 Maverick 17B Instruct",
-    "provider": "Meta",
-    "supports_image": true,
-    "input_modalities": [
-      "TEXT",
-      "IMAGE"
-    ],
-    "output_modalities": [
-      "TEXT"
-    ],
-    "streaming_supported": true,
-    "lifecycle_status": "ACTIVE",
-    "inferenceTypes": [
-      "PROVISIONED"
-    ],
+    "modelName": "",
+    "provider": "",
+    "supports_image": false,
+    "input_modalities": [],
+    "output_modalities": [],
+    "streaming_supported": false,
+    "lifecycle_status": "",
+    "inferenceTypes": [],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 1.0,
+      "output": 2.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false

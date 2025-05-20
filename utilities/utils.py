@@ -10,6 +10,35 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any, Union, Optional
 
+def parse_innermost_dict(d):
+    if type(d) == str and r"{" in d:
+        d = json.loads(d)
+    if type(d) == dict and "text" in d:
+        d = d["text"]
+    if type(d) == dict and "transcription" in d:
+        d = d["transcription"]
+    elif type(d) == str and r"{" in d:
+        inner_dict = d.split(r"{")[-1].split(r"}")[0]
+        temp = re.sub(r"[\n\'\"]", "", inner_dict)
+        d = json.loads(temp)
+    return d  
+
+def striplines(text):
+    return [s.strip() for s in text.splitlines()]
+    
+def get_blank_transcript(prompt_text):
+    fieldnames = get_fieldnames_from_prompt_text(prompt_text)
+    return {fieldname: "" for fieldname in fieldnames}
+
+def get_fieldnames_from_prompt_text(prompt_text):
+    prompt_text = "\n".join(striplines(prompt_text))
+    fieldnames = re.findall(r"(^\w+):", prompt_text, flags=re.MULTILINE)
+    return fieldnames 
+
+def get_content(fname):
+    with open(fname, 'r', encoding='utf-8') as f:
+        return f.read()       
+
 def ensure_directory_exists(directory: str) -> None:
     """
     Create a directory if it doesn't exist.

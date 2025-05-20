@@ -23,9 +23,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:19",
+    "last_test_timestamp": "2025-05-20 15:49:51",
     "last_test_details": {
-      "elapsed_seconds": 1.1816530227661133,
+      "elapsed_seconds": 0.9571707248687744,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -56,9 +56,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:21",
+    "last_test_timestamp": "2025-05-20 15:49:53",
     "last_test_details": {
-      "elapsed_seconds": 0.8404066562652588,
+      "elapsed_seconds": 0.9002032279968262,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -90,9 +90,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:22",
+    "last_test_timestamp": "2025-05-20 15:49:54",
     "last_test_details": {
-      "elapsed_seconds": 1.0003695487976074,
+      "elapsed_seconds": 1.0003142356872559,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -122,9 +122,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:24",
+    "last_test_timestamp": "2025-05-20 15:49:56",
     "last_test_details": {
-      "elapsed_seconds": 1.0915699005126953,
+      "elapsed_seconds": 1.0688493251800537,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -154,9 +154,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:26",
+    "last_test_timestamp": "2025-05-20 15:49:58",
     "last_test_details": {
-      "elapsed_seconds": 0.9972646236419678,
+      "elapsed_seconds": 0.8026525974273682,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -186,9 +186,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:27",
+    "last_test_timestamp": "2025-05-20 15:49:59",
     "last_test_details": {
-      "elapsed_seconds": 0.9701876640319824,
+      "elapsed_seconds": 0.8552827835083008,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -218,9 +218,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:29",
+    "last_test_timestamp": "2025-05-20 15:50:00",
     "last_test_details": {
-      "elapsed_seconds": 0.8595950603485107,
+      "elapsed_seconds": 1.1317172050476074,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -252,12 +252,12 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:49:30",
+    "last_test_timestamp": "2025-05-20 15:50:02",
     "last_test_details": {
-      "elapsed_seconds": 11.690961360931396,
-      "input_tokens": 3424,
-      "output_tokens": 282,
-      "total_cost": 0.003,
+      "elapsed_seconds": 18.68827176094055,
+      "input_tokens": 3416,
+      "output_tokens": 478,
+      "total_cost": 0.004,
       "error": ""
     }
   },
@@ -286,9 +286,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:43",
+    "last_test_timestamp": "2025-05-20 15:50:21",
     "last_test_details": {
-      "elapsed_seconds": 0.9189674854278564,
+      "elapsed_seconds": 1.037578821182251,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -320,9 +320,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:44",
+    "last_test_timestamp": "2025-05-20 15:50:23",
     "last_test_details": {
-      "elapsed_seconds": 0.7982761859893799,
+      "elapsed_seconds": 0.9059264659881592,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -355,12 +355,12 @@
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:49:46",
+    "last_test_timestamp": "2025-05-20 15:50:25",
     "last_test_details": {
-      "elapsed_seconds": 5.3898115158081055,
-      "input_tokens": 3391,
-      "output_tokens": 287,
-      "total_cost": 0.003,
+      "elapsed_seconds": 7.211533308029175,
+      "input_tokens": 3383,
+      "output_tokens": 411,
+      "total_cost": 0.004,
       "error": ""
     }
   },
@@ -389,9 +389,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:52",
+    "last_test_timestamp": "2025-05-20 15:50:32",
     "last_test_details": {
-      "elapsed_seconds": 0.9887609481811523,
+      "elapsed_seconds": 0.7947797775268555,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -423,9 +423,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:49:53",
+    "last_test_timestamp": "2025-05-20 15:50:34",
     "last_test_details": {
-      "elapsed_seconds": 0.9317796230316162,
+      "elapsed_seconds": 0.8365161418914795,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -458,11 +458,11 @@
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:49:55",
+    "last_test_timestamp": "2025-05-20 15:50:35",
     "last_test_details": {
-      "elapsed_seconds": 5.1941447257995605,
-      "input_tokens": 3391,
-      "output_tokens": 524,
+      "elapsed_seconds": 5.188994884490967,
+      "input_tokens": 3383,
+      "output_tokens": 536,
       "total_cost": 0.004,
       "error": ""
     }
@@ -492,9 +492,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:01",
+    "last_test_timestamp": "2025-05-20 15:50:41",
     "last_test_details": {
-      "elapsed_seconds": 0.8932845592498779,
+      "elapsed_seconds": 0.8474175930023193,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -525,9 +525,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:02",
+    "last_test_timestamp": "2025-05-20 15:50:43",
     "last_test_details": {
-      "elapsed_seconds": 0.7966017723083496,
+      "elapsed_seconds": 1.0455713272094727,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -558,9 +558,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:04",
+    "last_test_timestamp": "2025-05-20 15:50:44",
     "last_test_details": {
-      "elapsed_seconds": 1.064610242843628,
+      "elapsed_seconds": 0.988806962966919,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -591,9 +591,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:05",
+    "last_test_timestamp": "2025-05-20 15:50:46",
     "last_test_details": {
-      "elapsed_seconds": 0.9984884262084961,
+      "elapsed_seconds": 0.8441441059112549,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -624,75 +624,9 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:07",
+    "last_test_timestamp": "2025-05-20 15:50:47",
     "last_test_details": {
-      "elapsed_seconds": 1.0532288551330566,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_cost": 0,
-      "error": ""
-    }
-  },
-  {
-    "modelId": "stability.stable-diffusion-xl-v1:0",
-    "modelName": "SDXL 1.0",
-    "provider": "Stability AI",
-    "supports_image": true,
-    "input_modalities": [
-      "TEXT",
-      "IMAGE"
-    ],
-    "output_modalities": [
-      "IMAGE"
-    ],
-    "streaming_supported": false,
-    "lifecycle_status": "LEGACY",
-    "inferenceTypes": [
-      "PROVISIONED"
-    ],
-    "pricing": {
-      "input": 0.0,
-      "output": 0.0
-    },
-    "use_inference_profile": false,
-    "on_demand_supported": false,
-    "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:09",
-    "last_test_details": {
-      "elapsed_seconds": 0.8521513938903809,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_cost": 0,
-      "error": ""
-    }
-  },
-  {
-    "modelId": "stability.stable-diffusion-xl-v1",
-    "modelName": "SDXL 1.0",
-    "provider": "Stability AI",
-    "supports_image": true,
-    "input_modalities": [
-      "TEXT",
-      "IMAGE"
-    ],
-    "output_modalities": [
-      "IMAGE"
-    ],
-    "streaming_supported": false,
-    "lifecycle_status": "LEGACY",
-    "inferenceTypes": [
-      "ON_DEMAND"
-    ],
-    "pricing": {
-      "input": 0.0,
-      "output": 0.0
-    },
-    "use_inference_profile": false,
-    "on_demand_supported": true,
-    "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:10",
-    "last_test_details": {
-      "elapsed_seconds": 1.033813238143921,
+      "elapsed_seconds": 0.8568217754364014,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -723,9 +657,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:12",
+    "last_test_timestamp": "2025-05-20 15:50:49",
     "last_test_details": {
-      "elapsed_seconds": 0.9722068309783936,
+      "elapsed_seconds": 0.9748640060424805,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -756,9 +690,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:14",
+    "last_test_timestamp": "2025-05-20 15:50:50",
     "last_test_details": {
-      "elapsed_seconds": 1.0335006713867188,
+      "elapsed_seconds": 0.8319430351257324,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -789,12 +723,12 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:50:15",
+    "last_test_timestamp": "2025-05-20 15:50:52",
     "last_test_details": {
-      "elapsed_seconds": 20.947150230407715,
+      "elapsed_seconds": 17.23848056793213,
       "input_tokens": 3209,
-      "output_tokens": 566,
-      "total_cost": 0.04,
+      "output_tokens": 551,
+      "total_cost": 0.039,
       "error": ""
     }
   },
@@ -822,9 +756,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:37",
+    "last_test_timestamp": "2025-05-20 15:51:10",
     "last_test_details": {
-      "elapsed_seconds": 1.143056869506836,
+      "elapsed_seconds": 0.9677953720092773,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -855,9 +789,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:38",
+    "last_test_timestamp": "2025-05-20 15:51:11",
     "last_test_details": {
-      "elapsed_seconds": 0.9091837406158447,
+      "elapsed_seconds": 0.8419189453125,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -888,11 +822,11 @@
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:50:40",
+    "last_test_timestamp": "2025-05-20 15:51:13",
     "last_test_details": {
-      "elapsed_seconds": 7.786705255508423,
+      "elapsed_seconds": 7.386662483215332,
       "input_tokens": 3209,
-      "output_tokens": 597,
+      "output_tokens": 577,
       "total_cost": 0.04,
       "error": ""
     }
@@ -921,9 +855,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:48",
+    "last_test_timestamp": "2025-05-20 15:51:21",
     "last_test_details": {
-      "elapsed_seconds": 0.9622139930725098,
+      "elapsed_seconds": 1.1607263088226318,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -954,9 +888,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:50",
+    "last_test_timestamp": "2025-05-20 15:51:23",
     "last_test_details": {
-      "elapsed_seconds": 0.9091842174530029,
+      "elapsed_seconds": 1.0686030387878418,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -987,9 +921,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:51",
+    "last_test_timestamp": "2025-05-20 15:51:25",
     "last_test_details": {
-      "elapsed_seconds": 0.7973911762237549,
+      "elapsed_seconds": 1.1147894859313965,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1020,9 +954,9 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:50:52",
+    "last_test_timestamp": "2025-05-20 15:51:27",
     "last_test_details": {
-      "elapsed_seconds": 0.9291503429412842,
+      "elapsed_seconds": 1.3311774730682373,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1054,11 +988,11 @@
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:50:54",
+    "last_test_timestamp": "2025-05-20 15:51:28",
     "last_test_details": {
-      "elapsed_seconds": 13.472883701324463,
+      "elapsed_seconds": 17.92902421951294,
       "input_tokens": 3209,
-      "output_tokens": 559,
+      "output_tokens": 554,
       "total_cost": 0.039,
       "error": ""
     }
@@ -1087,11 +1021,11 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:51:08",
+    "last_test_timestamp": "2025-05-20 15:51:47",
     "last_test_details": {
-      "elapsed_seconds": 30.817753076553345,
+      "elapsed_seconds": 20.371103525161743,
       "input_tokens": 3209,
-      "output_tokens": 522,
+      "output_tokens": 524,
       "total_cost": 0.039,
       "error": ""
     }
@@ -1120,11 +1054,11 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-11 19:51:39",
+    "last_test_timestamp": "2025-05-20 15:52:08",
     "last_test_details": {
-      "elapsed_seconds": 16.64618444442749,
+      "elapsed_seconds": 16.05280089378357,
       "input_tokens": 3209,
-      "output_tokens": 563,
+      "output_tokens": 564,
       "total_cost": 0.04,
       "error": ""
     }
@@ -1153,9 +1087,9 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:51:57",
+    "last_test_timestamp": "2025-05-20 15:52:25",
     "last_test_details": {
-      "elapsed_seconds": 1.115844964981079,
+      "elapsed_seconds": 1.6148681640625,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1186,9 +1120,9 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:51:58",
+    "last_test_timestamp": "2025-05-20 15:52:27",
     "last_test_details": {
-      "elapsed_seconds": 1.257274866104126,
+      "elapsed_seconds": 0.9287703037261963,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1219,9 +1153,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:00",
+    "last_test_timestamp": "2025-05-20 15:52:28",
     "last_test_details": {
-      "elapsed_seconds": 1.2562191486358643,
+      "elapsed_seconds": 0.9902844429016113,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1252,9 +1186,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:02",
+    "last_test_timestamp": "2025-05-20 15:52:30",
     "last_test_details": {
-      "elapsed_seconds": 0.9392566680908203,
+      "elapsed_seconds": 0.9565801620483398,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1285,9 +1219,9 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:03",
+    "last_test_timestamp": "2025-05-20 15:52:31",
     "last_test_details": {
-      "elapsed_seconds": 1.0800318717956543,
+      "elapsed_seconds": 1.1257152557373047,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1318,9 +1252,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:05",
+    "last_test_timestamp": "2025-05-20 15:52:33",
     "last_test_details": {
-      "elapsed_seconds": 1.3744118213653564,
+      "elapsed_seconds": 0.9095363616943359,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1351,9 +1285,9 @@
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:07",
+    "last_test_timestamp": "2025-05-20 15:52:35",
     "last_test_details": {
-      "elapsed_seconds": 0.9996862411499023,
+      "elapsed_seconds": 0.9933631420135498,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
@@ -1384,9 +1318,9 @@
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-11 19:52:09",
+    "last_test_timestamp": "2025-05-20 15:52:36",
     "last_test_details": {
-      "elapsed_seconds": 0.9524028301239014,
+      "elapsed_seconds": 1.4551715850830078,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,

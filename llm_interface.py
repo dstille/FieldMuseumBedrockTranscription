@@ -1,6 +1,7 @@
 import time
 import json
 import os
+from utilities import utils
 
 class ImageProcessor:
 
@@ -10,12 +11,17 @@ class ImageProcessor:
         self.api_key = api_key.strip()
         self.prompt_name = prompt_name
         self.prompt_text = prompt_text
+        self.fieldnames = self.get_fieldnames()
         self.model = model
         self.modelname = modelname
         self.input_tokens = 0
         self.output_tokens = 0
         self.set_token_costs_per_mil()
         self.num_processed = 0
+
+    def get_fieldnames(self):
+        fieldnames =  utils.get_fieldnames_from_prompt_text(self.prompt_text)
+        return fieldnames or "fieldnames not extracted"
 
     def ensure_directory_exists(self, directory):
         if not os.path.exists(directory):
