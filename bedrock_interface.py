@@ -146,6 +146,7 @@ class BedrockImageProcessor(ImageProcessor):
             return False
         
         inference_types = self.model_info.get("inferenceTypes", [])
+        return "INFERENCE_PROFILE" in inference_types
         return "INFERENCE_PROFILE" in inference_types and "ON_DEMAND" not in inference_types
     
     def get_inference_profile_id(self) -> str:

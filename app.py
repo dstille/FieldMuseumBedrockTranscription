@@ -718,13 +718,13 @@ def main():
         if st.session_state.jobs_dict["to_process"]:
             is_succcess = run_jobs()
             if not is_succcess:
-                msg = st.session_state.results[0]["message"]
+                msg = st.session_state.results[-1]["message"]
                 st.error(msg)
     if st.session_state.error_flag:
         proceed_option = st.radio("How to Proceeed?:", ["Pause", "Retry Failed and Remaining Jobs", "Substitute Blank Transcript and Finish Remaining Jobs", "Skip Failed Jobs and Finish Remaining Jobs", "Cancel All Jobs"], index=None, key="proceed_option", on_change=handle_proceed_option)
         is_succcess = st.session_state.error_flag
         if not is_succcess:
-            msg = st.session_state.results[0]["message"]
+            msg = st.session_state.results[-1]["message"]
             st.error("Another Error!!!")
             st.error(msg)
         #st.rerun()

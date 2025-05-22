@@ -2,6 +2,43 @@
 
 
 
+Not all processing will be successful. I want to alert the user when a job fails and give them options for how to proceed
+use st.radio
+make use of keys and st.session_state and flags
+The options are to:
+- retry failed jobs (call resume_job(try_failed_jobs=True))
+- skip failed jobs  (call resume_job(try_failed_jobs=False))
+- abort processing  (st.session_state.jobs_dict["to_process] = [])
+- wait
+I have brought in part of an app from another repo--Transcriber.py--for ideas of how to handle this
+The trick is not to generate errors by creating multiple verions of the same st.radio 
+
+
+##########################################
+
+It's time to get ready for a commit
+Before I do, I want to do these things:
+1) get rid of unnecessary files. look for old files that are no longer need or that were there just to debug
+2) the app seems to work, so it's time to add error handling so there are not runtime errors that crash the whole things
+3) update the README
+4) take creating the gitignore out of the setup
+5) look for data files and their directories that should be part of the gitignore
+
+If you questions about what files should be eliminated, ask
+
+
+
+
+###################################
+
+
+Good. Now modify the app so models that passed the image test can be selected.
+These items should be addressed:
+1) If an inference profile is available, use that when calling the model
+2) For this iteration, use a text prompt and get the transcription as json--if the model supports that--otherwise get the transcription as text and convert it to a json.
+3) Improve error messaging with a focus on letting  the user know why a transcript was not provided
+
+
 
 ####################################
 re-write setup.py with the following goals in mind:
@@ -10,7 +47,8 @@ re-write setup.py with the following goals in mind:
 3) if all goes right, vision_model_info.json should contain at a minimum 3-5-sonnet-v-1, 3-5-sonnet-v-2, various nova models and various llama models.
 4) save changes to the app for later, but make all changes to other files necessary to create that json.
 5) consolidate model testing to one file
-6) consolidate model information retrieval, e.g., getting info from Bedrock, to one file
+6) consolidate model information retrieval, e.g., getting info from Bedrock, to one 
+7) you have permission to edit, create and test any files
 
 
 
