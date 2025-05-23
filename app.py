@@ -229,7 +229,7 @@ def save_transcriptions_csv(transcriptions, volume_name):
     os.makedirs(TRANSCRIPTIONS_DIR, exist_ok=True)
     filename = f"{TRANSCRIPTIONS_DIR}/{volume_name}.csv"
     try:
-        fieldnames = ["image_name"]  # Start with image_name as the first field
+        fieldnames = ["imageName"]  # Start with image_name as the first field
         for image_name, data in transcriptions.items():
             if isinstance(data, dict):
                 for key in data.keys():
@@ -695,9 +695,7 @@ def main():
                 st.session_state.results.append({"url": url, "status": "error", "message": error})
                 continue
             # Get the original filename from the URL
-            original_filename = url.split("/")[-1]
-            if not original_filename or original_filename == url:
-                original_filename = f"image_{i}"
+            original_filename = url #url.split("/")[-1]
             job = (image_path, original_filename, i, url)    
             load_job(job)
         # End Loading URL Images    
