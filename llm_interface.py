@@ -43,10 +43,15 @@ class ImageProcessor:
                 "time to create/edit (mins)": time_elapsed,
                 } | self.get_token_costs()
 
+    def get_legal_filename(self, image_name):
+        # Remove any characters that are not alphanumeric, underscore, or hyphen
+        return "".join(c for c in image_name if c.isalnum() or c in ['_', '-'])            
+
     def save_raw_response(self, response_data, image_name):
         directory = f"{self.raw_response_folder}/{self.modelname}"
         self.ensure_directory_exists(directory)
-        filename = f"{directory}/{image_name}-{self.get_timestamp()}-raw.json"
+        legal_image_name = self.get_legal_filename(image_name)
+        filename = f"{directory}/{legal_image_name}-{self.get_timestamp()}-raw.json"
         
         # Limit the size of the response data to avoid huge files
         max_size = 10000  # Maximum characters to save

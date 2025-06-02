@@ -130,13 +130,6 @@ def download_image(url, index):
             # Use the original filename directly (without timestamp)
             filename = original_filename
             file_path = os.path.join(TEMP_IMAGES_DIR, filename)
-            
-            # If file already exists, add a suffix
-            if os.path.exists(file_path):
-                base_name, extension = os.path.splitext(filename)
-                filename = f"{base_name}_{int(time.time())}{extension}"
-                file_path = os.path.join(TEMP_IMAGES_DIR, filename)
-            
             # Save the image
             with open(file_path, "wb") as f:
                 f.write(response.content)
@@ -244,7 +237,9 @@ def save_transcriptions_csv(transcriptions, volume_name):
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for image_name, data in transcriptions.items():
-                data = {"image_name": image_name} | data
+                for fieldname, val in data.items():
+                    data[fieldname] = val.replace('\n', ' ').replace('\r', '')
+                data = {"imageName": image_name} | data
                 writer.writerow(data)
         print(f"Successfully saved CSV transcriptions to {filename}")
     except Exception as e:

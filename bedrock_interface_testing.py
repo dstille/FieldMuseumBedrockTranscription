@@ -137,12 +137,14 @@ class BedrockImageProcessor(ImageProcessor):
             elif "generation" in response_body:
                 # Meta-like format
                 return response_body.get("generation", "")
-            
+            elif "transcription" in response_body:
+                # Simple format
+                return response_body.get("transcription", "")       
             elif "text" in response_body:
                 # Simple format
                 return response_body.get("text", "")
-            
             # If we can't find a known structure, convert the whole response to a string
+            print(f"BIP, line 147, extract_text: Unknown response format: {response_body}")
             return json.dumps(response_body)
         except Exception as e:
             print(f"Error extracting text from response: {str(e)}")

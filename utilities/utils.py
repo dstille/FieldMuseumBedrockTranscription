@@ -12,15 +12,21 @@ from typing import Dict, List, Any, Union, Optional
 
 def parse_innermost_dict(d):
     if type(d) == str and r"{" in d:
+        inner_dict = d.split(r"{")[-1].split(r"}")[0]
+        #print(f"{inner_dict = }")
+        #temp = re.sub(r"[\n\'\"]", "", inner_dict)
+        d = "{" + inner_dict + "}"
+        #d = d.replace("\\", "")
+        #### remove excess escape characters
+        d = remove_extra_escape_chars(d)
+        #d = re.match(r".*({.*}).*", d, flags=re.DOTALL).group(1)
+        print(f"{d = }")
         d = json.loads(d)
     if type(d) == dict and "text" in d:
         d = d["text"]
     if type(d) == dict and "transcription" in d:
         d = d["transcription"]
-    elif type(d) == str and r"{" in d:
-        inner_dict = d.split(r"{")[-1].split(r"}")[0]
-        temp = re.sub(r"[\n\'\"]", "", inner_dict)
-        d = json.loads(temp)
+
     return d  
 
 def striplines(text):
@@ -373,7 +379,35 @@ def batch_convert_prompts(input_dir: str, output_dir: str, to_json: bool = True)
             write_text_file(prompt_text, str(output_file))
             print(f"Converted {file_path} to {output_file}")
 
+
+def remove_extra_escape_chars(text: str) -> str:
+    """
+    Remove extra escape characters from a string.
+
+    Args:
+        text: The input string
+
+    Returns:
+        The string with extra escape characters removed
+    """
+    temp =  re.sub(r'\\(\')', r'\1', text)
+    # find unicode chars with extra '\'
+    matches = re.findall(r'\\u([0-9a-fA-F]{4})', temp)
+    for match in matches:
+        temp = temp.replace(f"\\u{match}", chr(int(match, 16)))
+    #temp = re.sub(r"\\", "", temp)    
+    return temp           
+
 if __name__ == "__main__":
     # Example usage
     print("Utility functions for Field Museum Bedrock Transcription")
     print("Import this module to use the functions in your application.")
+    s1 = "\'S"
+    s2 = "\\'S"
+    s3 = "\u1234"
+    s4 = "\\u1234"
+    s5 = "\uABCF"
+    s6 = "\\uABCF"
+    s7 = "\uabcd"
+    for s in [s1, s2, s3, s4, s5, s6, s7]:
+        print(f"{s} -> {remove_extra_escape_chars(s)}")

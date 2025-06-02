@@ -86,7 +86,7 @@ class BedrockImageProcessor(ImageProcessor):
         # Add a request for JSON output to the prompt text if not already present
         prompt_text = self.prompt_text
         if "json" not in prompt_text.lower():
-            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field."
+            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field. Do not include any newlines, tabs or returns within individual fields."
         
         # Generic format that works with most models
         return {
@@ -443,12 +443,13 @@ class BedrockImageProcessorTesting(ImageProcessor):
             elif "generation" in response_body:
                 # Meta-like format
                 return response_body.get("generation", "")
-            
+            elif "transcription" in response_body:
+                return response_body.get("transcription", "")
             elif "text" in response_body:
                 # Simple format
                 return response_body.get("text", "")
-            
             # If we can't find a known structure, convert the whole response to a string
+            print(f"BIM, line 452, extract text: Unknown response format: {response_body}")
             return json.dumps(response_body)
         except Exception as e:
             print(f"Error extracting text from response: {str(e)}")

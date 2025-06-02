@@ -2,16 +2,18 @@ import json
 import re
 
 def parse_innermost_dict(data):
-    if type(d) == dict:
-        d = d["transcription"] if "transcription" in d else d["text"] if "text" in d else d
-        return "\n".join(f"{k}: {v}" for k, v in d.items())
+    if type(d) == dict and "text" in d:
+        d = d["text"]
+    if type(d) == dict and "transcription" in d:
+        d = d["transcription"]
+    return d    
     elif type(d) == str and r"{" in d:
-        inner_dict = d.split(r"{")[-1].split(r"}")[0]
-        temp = re.sub(r"[\n\'\"]", "", inner_dict)
-        lines = [line.strip() for line in temp.split(",")]
-        return "\n".join(lines)
-    else:
-        return json.dumps(d)  
+        temp = d.split(r"{")[-1].split(r"}")[0]
+        inner_dict = "{" + temp + "}" 
+        try:
+            return json.loads(inner_dict)
+        except:
+            return d 
 
 def parse_from_string(data):
     pattern = r'(\d+:\d+:\d+,\d+) --> (\d+:\d+:\d+,\d+)'
