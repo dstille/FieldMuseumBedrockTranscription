@@ -1,12 +1,16 @@
 import time
 import json
 import os
+import re
 from utilities import utils
 
 class ImageProcessor:
 
-    def __init__(self, api_key, prompt_name, prompt_text, model, modelname):
-        self.raw_response_folder = "raw_llm_responses"
+    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name):
+        raw_response_dir = "raw_llm_responses"
+        self.ensure_directory_exists(raw_response_dir)
+        self.output_name = output_name
+        self.raw_response_folder = os.path.join(raw_response_dir, output_name)
         self.ensure_directory_exists(self.raw_response_folder)
         self.api_key = api_key.strip()
         self.prompt_name = prompt_name
@@ -16,6 +20,7 @@ class ImageProcessor:
         self.modelname = modelname
         self.input_tokens = 0
         self.output_tokens = 0
+        self.pricing_data = self.load_pricing_data()
         self.set_token_costs_per_mil()
         self.num_processed = 0
 
@@ -36,46 +41,52 @@ class ImageProcessor:
             "output tokens": self.output_tokens,
             "input cost $": round((self.input_tokens / 1_000_000) * self.input_cost_per_mil, 3),
             "output cost $": round((self.output_tokens / 1_000_000) * self.output_cost_per_mil, 3)
-        }         
+        } 
+
+    def load_pricing_data(self):
+        """Load pricing data from the bedrock_models_pricing.json file."""
+        try:
+            path = "model_info/bedrock_models_pricing.json"
+            if os.path.exists(path):
+                with open(path, 'r') as f:
+                    return json.load(f)
+            print("Warning: Could not find model_info/bedrock_models_pricing.json file")
+            return {}
+        except Exception as e:
+            print(f"Error loading pricing data: {str(e)}")
+            return {}            
 
     def get_transcript_processing_data(self, time_elapsed):
         return {
                 "time to create/edit (mins)": time_elapsed,
                 } | self.get_token_costs()
 
-    def get_legal_filename(self, image_name):
-        # Remove any characters that are not alphanumeric, underscore, or hyphen
-        return "".join(c for c in image_name if c.isalnum() or c in ['_', '-'])            
+    def get_legal_filename(self, filename):
+        return re.sub(r'[\\/*?:]', "_", filename)     
 
     def save_raw_response(self, response_data, image_name):
-        directory = f"{self.raw_response_folder}/{self.modelname}"
-        self.ensure_directory_exists(directory)
         legal_image_name = self.get_legal_filename(image_name)
-        filename = f"{directory}/{legal_image_name}-{self.get_timestamp()}-raw.json"
-        
+        filename = f"{self.raw_response_folder}/{legal_image_name}-raw.json"
         # Limit the size of the response data to avoid huge files
         max_size = 10000  # Maximum characters to save
-        
+        raw_response = None
         try:
             # Import base64_filter here to avoid circular imports
             from utilities.base64_filter import filter_base64_from_dict
-            
             # Filter out base64 content before saving
-            filtered_data = filter_base64_from_dict(response_data)
-            
+            raw_response = filter_base64_from_dict(response_data)
             # Convert to string and check size
-            response_str = json.dumps(filtered_data, ensure_ascii=False, indent=4)
+            response_str = json.dumps(raw_response, ensure_ascii=False, indent=4)
             if len(response_str) > max_size:
                 # Create a truncated version
-                truncated_data = {"truncated_response": True, "message": "Response was too large and has been truncated"}
-                with open(filename, 'w', encoding='utf-8') as f:
-                    json.dump(truncated_data, f, ensure_ascii=False, indent=4)
-            else:
-                # Save the filtered response
-                with open(filename, 'w', encoding='utf-8') as f:
-                    json.dump(filtered_data, f, ensure_ascii=False, indent=4)
+                raw_response = {"truncated_response": response_str[:max_size] + "..."}
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(raw_response, f, ensure_ascii=False, indent=4)
+            print(f"Successfully saved raw response to {filename}")
+            return raw_response
         except Exception as e:
             print(f"Error saving raw response: {str(e)}")
+            return raw_response
 
     def update_usage(self, response_data):
         if "usage" in response_data:
@@ -84,5 +95,35 @@ class ImageProcessor:
             self.output_tokens = int(usage.get("completion_tokens", 0))                           
 
     def set_token_costs_per_mil(self):
-        self.input_cost_per_mil = 0.0
-        self.output_cost_per_mil = 0.0
+        """Set token costs based on the model provider and model name from pricing data."""
+        provider = self.model.split(".")[0] if "." in self.model else ""
+        model_short_name = self.model.split(".")[-1] if "." in self.model else self.model
+        
+        # Default costs
+        self.input_cost_per_mil = 1.0
+        self.output_cost_per_mil = 2.0
+        
+        # Try to get pricing from the pricing data file
+        if hasattr(self, 'pricing_data') and self.pricing_data and provider in self.pricing_data:
+            # Try to find an exact match for the model
+            for model_key, price_info in self.pricing_data[provider].items():
+                # Check if model_key is part of the model name or vice versa
+                if model_key in model_short_name or model_short_name in model_key:
+                    self.input_cost_per_mil = price_info.get("input_token_price_per_1M", self.input_cost_per_mil)
+                    self.output_cost_per_mil = price_info.get("output_token_price_per_1M", self.output_cost_per_mil)
+                    print(f"Found pricing for {model_key}: Input=${self.input_cost_per_mil}/1M, Output=${self.output_cost_per_mil}/1M")
+                    return
+        
+        # Fallback to provider-specific costs if no match found
+        if provider == "anthropic":
+            self.input_cost_per_mil = 8.0
+            self.output_cost_per_mil = 24.0
+        elif provider == "amazon":
+            self.input_cost_per_mil = 0.8
+            self.output_cost_per_mil = 1.6
+        elif provider == "mistral":
+            self.input_cost_per_mil = 7.0
+            self.output_cost_per_mil = 20.0
+        elif provider == "meta":
+            self.input_cost_per_mil = 6.0
+            self.output_cost_per_mil = 6.0    

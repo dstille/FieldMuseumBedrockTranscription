@@ -13,20 +13,15 @@ from typing import Dict, List, Any, Union, Optional
 def parse_innermost_dict(d):
     if type(d) == str and r"{" in d:
         inner_dict = d.split(r"{")[-1].split(r"}")[0]
-        #print(f"{inner_dict = }")
-        #temp = re.sub(r"[\n\'\"]", "", inner_dict)
         d = "{" + inner_dict + "}"
-        #d = d.replace("\\", "")
         #### remove excess escape characters
         d = remove_extra_escape_chars(d)
-        #d = re.match(r".*({.*}).*", d, flags=re.DOTALL).group(1)
         print(f"{d = }")
         d = json.loads(d)
     if type(d) == dict and "text" in d:
         d = d["text"]
     if type(d) == dict and "transcription" in d:
         d = d["transcription"]
-
     return d  
 
 def striplines(text):
