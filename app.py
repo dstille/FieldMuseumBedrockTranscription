@@ -61,7 +61,9 @@ def initialize_variables():
     if 'show_results_override' not in st.session_state:               
         st.session_state.show_results_override = False
     if 'image_numbers' not in st.session_state:
-        st.session_state.image_numbers = {}     
+        st.session_state.image_numbers = {}
+    if 'time_start' not in st.session_state:
+        st.session_state.time_start = get_timestamp()         
 
 def copy_local_image(source_path, index):
     try:
@@ -116,9 +118,7 @@ def ensure_directory_exists(directory):
         os.makedirs(directory)
 
 def get_legal_filename(filename):
-    return re.sub(r'[\\/*?:]', "_", filename)
-    # Remove any characters that are not alphanumeric, underscore, dash, slash or hyphen
-    return "".join(c for c in filename if c.isalnum() or c in ['_', '-', '.', '\\', '/'])         
+    return re.sub(r'[\\/*?:]', "_", filename)        
 
 def get_raw_llm_response(image_name):
     legal_image_name = get_legal_filename(image_name)
@@ -134,7 +134,7 @@ def get_timestamp():
     return time.strftime("%Y-%m-%d-%H%M")
 
 def get_volume_name(model_name_short):
-    return f"{model_name_short}-{st.session_state.start_time_str}" 
+    return f"{model_name_short}-{st.session_state.time_start}" 
 
 def handle_proceed_option():
     print(f"in handle_proceed_option @ {get_timestamp()}")
@@ -237,7 +237,7 @@ def process_single_image(img_path, orig_filename, item_index, source_identifier)
             model=st.session_state.selected_model,
             modelname=st.session_state.model_name,
             output_name=st.session_state.volume_name,
-            testing=True
+            testing=False
         )
         # Process the image
         image_number, attempt_number = st.session_state.image_numbers[orig_filename]
@@ -268,7 +268,7 @@ def process_single_image(img_path, orig_filename, item_index, source_identifier)
         # Create a more detailed error message
         from utilities.error_message import ErrorMessage
         error_obj = ErrorMessage.from_exception(e)
-        error_msg = error_obj.get_truncated_message(300)
+        error_msg = error_obj.get_truncated_message(1000)
         # Add more context to the error message
         if "access denied" in str(e).lower():
             error_msg += "\nAccess denied: You may not have permissions to use this model."
@@ -591,17 +591,14 @@ def main():
         # 4. Begin Naming Output
         st.subheader("4. Name Output")
         if selected_model:
-            model_name_parts = selected_model.split('.')
-            if len(model_name_parts) > 1:
-                model_name = model_name_parts[1].split('-')[0]  # Get the base name (claude, llama, etc.)
-            else:
-                model_name = selected_model
+            model_name = selected_model.split(':')[0]
             suggested_volume_name = get_volume_name(model_name)
             suggested_volume_name = get_legal_filename(suggested_volume_name)
             # Allow user to edit the volume name
-            st.info(f"Suggested Output Name: {suggested_volume_name}")
+            st.warning("Suggested Output Name:")
+            st.info(suggested_volume_name)
             volume_name = st.text_input(
-                "You May Edit the Name Below. Ctrl+Enter to Accept Changes",
+                "You May Edit the Name Below. 'Enter' to Accept Changes",
                 value=suggested_volume_name,
                 help="You can use the suggested name or enter your own",
                 key="volume_name_input"
@@ -715,7 +712,9 @@ def main():
             attempt_number = result.get("attempt_number", 1)
             if '/' in display_name:
                 display_name = display_name.split("/")[-1]
-            with st.expander(f"Image {image_number}, Attempt {attempt_number}: {display_name}"):
+            st.session_state[f"expander_{display_name}"] = st.expander(f"Image {image_number}, Attempt {attempt_number}: {display_name}")
+            with st.session_state[f"expander_{display_name}"]:
+                st.write(f"Image {image_number}, Attempt {attempt_number}: {display_name}")
                 if result["status"] == "success":
                     st.success("Successfully processed")
                     # Display processing data
@@ -746,7 +745,7 @@ def main():
                     raw_llm_response = result.get("raw_response")
                     if not raw_llm_response:
                         st.warning("No raw LLM response available.")    
-                    elif st.toggle("Show Raw LLM Response", key=f"{display_name}: {attempt_number}"):
+                    elif st.toggle("Show Raw LLM Response (re-expand box after toggling)", key=f"{display_name}: {attempt_number}"):
                         st.write(raw_llm_response)
                         #st.json(raw_llm_response)
                     

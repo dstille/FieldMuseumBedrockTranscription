@@ -76,7 +76,7 @@ class ImageProcessor:
             # Filter out base64 content before saving
             raw_response = filter_base64_from_dict(response_data)
             # Convert to string and check size
-            response_str = json.dumps(filtered_data, ensure_ascii=False, indent=4)
+            response_str = json.dumps(raw_response, ensure_ascii=False, indent=4)
             if len(response_str) > max_size:
                 # Create a truncated version
                 raw_response = {"truncated_response": response_str[:max_size] + "..."}

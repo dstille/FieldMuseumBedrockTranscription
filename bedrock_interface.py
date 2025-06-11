@@ -13,7 +13,7 @@ class BedrockImageProcessor(ImageProcessor):
         super().__init__(api_key, prompt_name, prompt_text, model, modelname, output_name)
         self.bedrock_client = boto3.client("bedrock-runtime")
         self.bedrock_mgmt = boto3.client("bedrock")
-        self.model_info = None
+        self.model_info = self.load_model_info()
         self.account_id = self._get_account_id()
         self.set_token_costs_per_mil()
     
@@ -98,12 +98,13 @@ class BedrockImageProcessor(ImageProcessor):
         if not self.model_info:
             return False
         inference_types = self.model_info.get("inferenceTypes", [])
+        print(f"Inference types: {inference_types}")
         return "INFERENCE_PROFILE" in inference_types
     
     def get_model_id(self) -> str:
         """Get the inference profile ID for the model."""
         # For models that require inference profiles, construct the ARN
-        if self.needs_inference_profile() and self.account_id:
+        if self.needs_inference_profile():
             # Extract region from the client configuration
             region = self.bedrock_client.meta.region_name
             region_prefix = region.split('-')[0]  # e.g., "us" from "us-east-1"
