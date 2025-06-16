@@ -23,6 +23,9 @@ DATA_DIR = "data"
 MODEL_INFO_DIR = "model_info"
 UPLOAD_IMAGES_DIR = "images_to_upload"
 
+# constants
+TESTING_MODE = False
+
 def initialize_variables():
     if 'transcriptions' not in st.session_state:
         st.session_state.transcriptions = {}
@@ -58,12 +61,23 @@ def initialize_variables():
         st.session_state.proceed_option = None
     if 'try_failed_jobs' not in st.session_state:
         st.session_state.try_failed_jobs = False
-    if 'show_results_override' not in st.session_state:               
-        st.session_state.show_results_override = False
+    if 'auto_save_enabled' not in st.session_state:               
+        st.session_state.auto_save_enabled = True
     if 'image_numbers' not in st.session_state:
         st.session_state.image_numbers = {}
     if 'time_start' not in st.session_state:
-        st.session_state.time_start = get_timestamp()         
+        st.session_state.time_start = get_timestamp()
+    if 'pause_button_enabled' not in st.session_state:
+        st.session_state.pause_button_enabled = False             
+
+def compile_job(original_filename, image_idx):
+    pass
+
+def compile_successful_result():
+    pass
+
+def compile_failed_result():
+    pass        
 
 def copy_local_image(source_path, index):
     try:
@@ -130,6 +144,13 @@ def get_raw_llm_response(image_name):
     except FileNotFoundError:
         return None
 
+def get_saved_runs():
+    saved_runs = []
+    for file in os.listdir(DATA_DIR):
+        if file.endswith(".json") and is_incomplete_run(file):
+            saved_runs.append(file)
+    return saved_runs        
+
 def get_timestamp():
     return time.strftime("%Y-%m-%d-%H%M")
 
@@ -184,7 +205,12 @@ def image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode('utf-8') 
 
 def init_jobs(num_jobs):
-    st.session_state.jobs_dict = {"to_process": [], "in_process": (), "failed": [], "msg": {}, "num_total_jobs": num_jobs, "num_remaining_jobs": num_jobs}
+    st.session_state.jobs_dict = {"to_process": [], "in_process": (), "failed": [], "completed": [], "incomplete": [], "msg": {}, "num_total_jobs": num_jobs, "num_remaining_jobs": num_jobs}
+
+def is_incomplete_run(file):
+    with open(os.path.join(DATA_DIR, file), "r") as f:
+        data = json.load(f)
+    return "incomplete" in data and data["incomplete"]
 
 def load_job(job: dict):
     st.session_state.jobs_dict["to_process"].append(job)                      
@@ -220,6 +246,54 @@ def load_prompts():
         st.error(f"Error loading prompts: {str(e)}")
         return {}
 
+def load_saved_data(data_filename):
+    with open(os.path.join(DATA_DIR, data_filename), "r") as f:
+        data = json.load(f)
+    st.session_state.transcriptions = data["transcriptions"]
+    st.session_state.results = data["results"]
+    st.session_state.volume_name = data["run_id"]
+    st.session_state.selected_model = data["model"]["id"]
+    st.session_state.selected_model_obj = data["model"]["id"]
+    st.session_state.model_name = data["model"]["name"]
+    prompt_name = data["prompt"]
+    st.session_state.selected_prompt_name = prompt_name
+    prompt_text = load_prompts()[prompt_name]
+    st.session_state.selected_prompt_text = prompt_text
+    image_data = data["images"]
+    incomplete_jobs = data["incomplete"]
+    return image_data
+
+def load_saved_transcriptions(transcription_filename_no_ext):
+    for file in os.listdir(TRANSCRIPTIONS_DIR):
+        if file.beginswith(transcription_filename_no_ext):
+            file_path = os.path.join(TRANSCRIPTIONS_DIR, file)
+            st.session_state.output_file_path = file_path
+            st.session_state.output_format = file_path.split(".")[-1].upper()
+            with open(file_path, "r", encoding="utf-8") as f:
+                return f.read()    
+
+def load_saved_run(data_filename):
+    image_data = load_saved_data(data_filename)
+    transcription_filename_no_ext = data_filename.split("-data")[0] + "-transcription"
+    transcriptions = load_saved_transcriptions(transcription_filename_no_ext)
+    combine_
+    st.session_state.cost_data_path = data["cost_data_path"]
+    st.session_state.cost_summary = data["cost_summary"]
+    st.session_state.file_extension = data["file_extension"]
+    st.session_state.jobs_dict = data["jobs_dict"]
+    st.session_state.progress = data["progress"]
+    st.session_state.progress_bar.progress(st.session_state.progress)
+    st.session_state.auto_save_enabled = data["auto_save_enabled"]
+    st.session_state.image_numbers = data["image_numbers"]
+    st.session_state.time_start = data["time_start"]
+    st.session_state.pause_button_enabled = data["pause_button_enabled"]
+    st.session_state.pause_button_enabled = False
+    st.session_state.pause_button_placeholder.empty()
+    st.session_state.pause_button_placeholder = st.empty()
+    st.session_state.pause_button_placeholder.button("Pause", on_click=handle_pause_button, key="pause_button")
+    st.session_state.pause_button_placeholder.empty()
+    st.session_state.pause_button_placeholder = st.empty()        
+
 def number_images(image_names):
     # {image_name: (idx, num_attempts)}
     st.session_state.image_numbers = {image_name: [idx + 1, 0] for idx, image_name in enumerate(image_names)}       
@@ -237,7 +311,7 @@ def process_single_image(img_path, orig_filename, item_index, source_identifier)
             model=st.session_state.selected_model,
             modelname=st.session_state.model_name,
             output_name=st.session_state.volume_name,
-            testing=False
+            testing=TESTING_MODE
         )
         # Process the image
         image_number, attempt_number = st.session_state.image_numbers[orig_filename]
@@ -316,15 +390,26 @@ def run_jobs():
         st.session_state.try_failed_jobs = False    
     while jobs["to_process"]:
         jobs["in_process"] = jobs["to_process"].pop(0)
-        is_successful_job = process_single_image(*jobs["in_process"])
+        img_path, orig_filename, item_index, source_identifier = jobs["in_process"]
+        is_successful_job = process_single_image(img_path, orig_filename, item_index, source_identifier)
         print(f"run_jobs: {is_successful_job = }, {jobs['in_process'] = }")
         if not is_successful_job:
             jobs["failed"].append(jobs["in_process"])
+            jobs["incomplete"].append(orig_filename)
             jobs["in_process"] = ()
             jobs["msg"] = st.session_state.results[-1]
             st.session_state.error_flag = True
+            if st.session_state.auto_save_enabled:
+                save_transcriptions_callback()
             return False
-        jobs["num_remaining_jobs"] -= 1    
+        jobs["completed"].append(orig_filename)
+        if orig_filename in jobs["incomplete"]:
+            jobs["incomplete"].remove(orig_filename)
+        jobs["msg"] = st.session_state.results[-1]
+        jobs["in_process"] = ()        
+        jobs["num_remaining_jobs"] -= 1
+        if st.session_state.auto_save_enabled:
+                save_transcriptions_callback()    
     st.session_state.error_flag = False          
     return True
 
@@ -361,6 +446,8 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name):
         "prompt": prompt_name,
         "images_processed": len([r for r in st.session_state.results if r["status"] == "success"]),
         "images_failed": len([r for r in st.session_state.results if r["status"] == "error"]),
+        "completed_jobs": st.session_state.jobs_dict["completed"],
+        "incomplete_jobs": st.session_state.jobs_dict["incomplete"],
         "tokens": {
             "input": total_input_tokens,
             "output": total_output_tokens,
@@ -493,145 +580,161 @@ def main():
         st.success("App reset successfully!")
         st.rerun()
     set_start_time()    
-    st.session_state.show_results_override = st.toggle("Error Override and Show Results")    
+    st.session_state.auto_save_enabled = st.toggle(label="Auto Save", key="auto_save_option", value=True)    
     all_models = load_models()
     prompts = load_prompts()
-    ######### SIDEBAR  ############
-    # 1. Model
-    # 2. Prompt
-    # 3. Input Method (url or local)
-    # 4. Name for Saving Output
-    # 5. Format for Saving Output
-    # 6. Process Button
     with st.sidebar:
-        st.header("Configuration")
-        # 1. Begin Model Selection
-        st.subheader("1. Select Bedrock Model")
-        model_filter = st.radio(
-            "Filter models by:",
-            ["Models that passed image test", "All image-capable models", "All models"],
-            index=0
-        )
-        # Filter models by image test success and exclude Mistral models
-        image_test_success_models = [model for model in all_models 
-                                    if model.get("image_test_success", False) 
-                                    and not model.get("modelId", "").startswith("mistral.")]
-        image_capable_models = [model for model in all_models 
-                               if model.get("supports_image", False)
-                               and not model.get("modelId", "").startswith("mistral.")]
-        all_non_mistral_models = [model for model in all_models 
-                                 if not model.get("modelId", "").startswith("mistral.")]
-        if model_filter == "Models that passed image test":
-            models_to_show = image_test_success_models
-            st.success(f"Showing {len(image_test_success_models)} models that successfully processed images.")
-        elif model_filter == "All image-capable models":
-            models_to_show = image_capable_models
-            st.info(f"Showing {len(image_capable_models)} models with image support.")
-        else:
-            models_to_show = all_non_mistral_models
-            if len(image_capable_models) < len(all_non_mistral_models):
-                st.warning(f"Only {len(image_capable_models)} of {len(all_non_mistral_models)} models support image processing.")
-        # Add note about Mistral models being excluded
-        mistral_count = len([m for m in all_models if m.get("modelId", "").startswith("mistral.")])
-        #if mistral_count > 0:
-        #    st.info(f"Note: {mistral_count} Mistral models have been excluded to prevent terminal flooding issues.")
-        # Create a list of model display names for the selectbox
-        model_options = {model.get("display_name", model.get("modelId", "")): model for model in models_to_show}
-        selected_model_name = st.selectbox("Choose a model:", list(model_options.keys()))
-        # Get the selected model object
-        selected_model_obj = model_options[selected_model_name]
-        selected_model = selected_model_obj.get("modelId", "")
-        # Show model details
-        with st.expander("Model Details"):
-            st.json({
-                "Model ID": selected_model_obj.get("modelId", ""),
-                "Provider": selected_model_obj.get("provider", ""),
-                "Supports Image": selected_model_obj.get("supports_image", False),
-                "Image Test Success": selected_model_obj.get("image_test_success", False),
-                "Uses Inference Profile": selected_model_obj.get("use_inference_profile", False),
-                "On-Demand Supported": selected_model_obj.get("on_demand_supported", False)
-            })
-        # Show warning if selected model doesn't support images
-        if not selected_model_obj.get("supports_image", False):
-            st.error(f"Warning: {selected_model_name} does not support image processing!") 
-        # End Model Selection
-        # 2. Begin Prompt Selection
-        st.subheader("2. Select a Prompt")
-        selected_prompt_name = st.selectbox("Choose a prompt:", list(prompts.keys()))
-        selected_prompt_text = prompts[selected_prompt_name]
-        with st.expander("View Selected Prompt"):         # Display selected prompt
-            st.text_area("Prompt Content", selected_prompt_text, height=200, disabled=True)
-        # End Prompt Selection
-        # 3. Begin Input Method Selection
-        st.subheader("3. Select Input Method")
-        input_method = st.radio(
-            "Choose input method:",
-            ["Upload URLs File", "Select Local Images"],
-            help="Upload a text file with URLs or select images from your local images_to_upload folder"
-        )
-        uploaded_file = None
-        selected_local_images = []
-        if input_method == "Upload URLs File":
-            uploaded_file = st.file_uploader("Upload a text file with URLs (one per line)", type=["txt"])
-        else:
-            # List available images in the upload directory
-            available_images = []
-            for file in os.listdir(UPLOAD_IMAGES_DIR):
-                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    available_images.append(file)
-            if not available_images:
-                st.warning(f"No images found in the {UPLOAD_IMAGES_DIR} folder. Please add some images and refresh.")
-            else:
-                selected_local_images = st.multiselect(
-                    "Select images to process:",
-                    available_images,
-                    help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
-                )
-        # End Input Method Selection
-        # 4. Begin Naming Output
-        st.subheader("4. Name Output")
-        if selected_model:
-            model_name = selected_model.split(':')[0]
-            suggested_volume_name = get_volume_name(model_name)
-            suggested_volume_name = get_legal_filename(suggested_volume_name)
-            # Allow user to edit the volume name
-            st.warning("Suggested Output Name:")
-            st.info(suggested_volume_name)
-            volume_name = st.text_input(
-                "You May Edit the Name Below. 'Enter' to Accept Changes",
-                value=suggested_volume_name,
-                help="You can use the suggested name or enter your own",
-                key="volume_name_input"
+        st.session_state.task_option = "New Run"#= st.radio("Choose Operation", ["New Run", "Complete Saved Run"], index=0, key="selected_task")
+        ######### NEW RUN SIDEBAR  ############
+        # 1. Model
+        # 2. Prompt
+        # 3. Input Method (url or local)
+        # 4. Name for Saving Output
+        # 5. Format for Saving Output
+        # 6. Process Button
+        if st.session_state.task_option == "New Run":
+            st.header("Configuration")
+            # 1. Begin Model Selection
+            st.subheader("1. Select Bedrock Model")
+            model_filter = st.radio(
+                "Filter models by:",
+                ["Models that passed image test", "All image-capable models", "All models"],
+                index=0
             )
-            st.session_state.volume_name = volume_name
-            st.write("Look For") 
-            st.success(f"'transcriptions/{volume_name}-transcription'")
-            st.write("  And")
-            st.success(f"'data/{volume_name}-data'")
+            # Filter models by image test success and exclude Mistral models
+            image_test_success_models = [model for model in all_models 
+                                        if model.get("image_test_success", False) 
+                                        and not model.get("modelId", "").startswith("mistral.")]
+            image_capable_models = [model for model in all_models 
+                                if model.get("supports_image", False)
+                                and not model.get("modelId", "").startswith("mistral.")]
+            all_non_mistral_models = [model for model in all_models 
+                                    if not model.get("modelId", "").startswith("mistral.")]
+            if model_filter == "Models that passed image test":
+                models_to_show = image_test_success_models
+                st.success(f"Showing {len(image_test_success_models)} models that successfully processed images.")
+            elif model_filter == "All image-capable models":
+                models_to_show = image_capable_models
+                st.info(f"Showing {len(image_capable_models)} models with image support.")
+            else:
+                models_to_show = all_non_mistral_models
+                if len(image_capable_models) < len(all_non_mistral_models):
+                    st.warning(f"Only {len(image_capable_models)} of {len(all_non_mistral_models)} models support image processing.")
+            # Add note about Mistral models being excluded
+            mistral_count = len([m for m in all_models if m.get("modelId", "").startswith("mistral.")])
+            #if mistral_count > 0:
+            #    st.info(f"Note: {mistral_count} Mistral models have been excluded to prevent terminal flooding issues.")
+            # Create a list of model display names for the selectbox
+            model_options = {model.get("display_name", model.get("modelId", "")): model for model in models_to_show}
+            selected_model_name = st.selectbox("Choose a model:", list(model_options.keys()))
+            # Get the selected model object
+            selected_model_obj = model_options[selected_model_name]
+            selected_model = selected_model_obj.get("modelId", "")
+            # Show model details
+            with st.expander("Model Details"):
+                st.json({
+                    "Model ID": selected_model_obj.get("modelId", ""),
+                    "Provider": selected_model_obj.get("provider", ""),
+                    "Supports Image": selected_model_obj.get("supports_image", False),
+                    "Image Test Success": selected_model_obj.get("image_test_success", False),
+                    "Uses Inference Profile": selected_model_obj.get("use_inference_profile", False),
+                    "On-Demand Supported": selected_model_obj.get("on_demand_supported", False)
+                })
+            # Show warning if selected model doesn't support images
+            if not selected_model_obj.get("supports_image", False):
+                st.error(f"Warning: {selected_model_name} does not support image processing!") 
+            # End Model Selection
+            # 2. Begin Prompt Selection
+            st.subheader("2. Select a Prompt")
+            selected_prompt_name = st.selectbox("Choose a prompt:", list(prompts.keys()))
+            selected_prompt_text = prompts[selected_prompt_name]
+            with st.expander("View Selected Prompt"):         # Display selected prompt
+                st.text_area("Prompt Content", selected_prompt_text, height=200, disabled=True)
+            # End Prompt Selection
+            # 3. Begin Input Method Selection
+            st.subheader("3. Select Input Method")
+            input_method = st.radio(
+                "Choose input method:",
+                ["Upload URLs File", "Select Local Images"],
+                help="Upload a text file with URLs or select images from your local images_to_upload folder"
+            )
+            uploaded_file = None
+            selected_local_images = []
+            if input_method == "Upload URLs File":
+                uploaded_file = st.file_uploader("Upload a text file with URLs (one per line)", type=["txt"])
+            else:
+                # List available images in the upload directory
+                available_images = []
+                for file in os.listdir(UPLOAD_IMAGES_DIR):
+                    if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                        available_images.append(file)
+                if not available_images:
+                    st.warning(f"No images found in the {UPLOAD_IMAGES_DIR} folder. Please add some images and refresh.")
+                else:
+                    selected_local_images = st.multiselect(
+                        "Select images to process:",
+                        available_images,
+                        help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
+                    )
+            # End Input Method Selection
+            # 4. Begin Naming Output
+            st.subheader("4. Name Output")
+            if selected_model:
+                model_name = selected_model.split(':')[0]
+                suggested_volume_name = get_volume_name(model_name)
+                suggested_volume_name = get_legal_filename(suggested_volume_name)
+                # Allow user to edit the volume name
+                st.warning("Suggested Output Name:")
+                st.info(suggested_volume_name)
+                volume_name = st.text_input(
+                    "You May Edit the Name Below. 'Enter' to Accept Changes",
+                    value=suggested_volume_name,
+                    help="You can use the suggested name or enter your own",
+                    key="volume_name_input"
+                )
+                st.session_state.volume_name = volume_name
+                st.write("Look For") 
+                st.success(f"'transcriptions/{volume_name}-transcription'")
+                st.write("  And")
+                st.success(f"'data/{volume_name}-data'")
 
+            else:
+                st.warning("Please select a model to generate a suggested name.")
+            # End Naming Output
+            # 5. Begin Selection of Output File Format
+            st.subheader("5. Select File Format for Saving")
+            st.session_state.output_format = st.radio(
+                "Choose output format:",
+                ["JSON", "CSV", "TXT"],
+                help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
+            )
+            # End Selection of Output File Format
+            # 6. Process button - disable if no input is provided
+            process_button_disabled = (input_method == "Upload URLs File" and not uploaded_file) or \
+                                    (input_method == "Select Local Images" and not selected_local_images)
+            #process_button_disabled = False
+            process_button_clicked = st.button("Process Images", type="primary", disabled=process_button_disabled)
+            # End 6.
+            # persistance
+            st.session_state.selected_model = selected_model
+            st.session_state.model_name = model_name
+            st.session_state.selected_model_obj = selected_model_obj
+            st.session_state.selected_prompt_name = selected_prompt_name
+            st.session_state.selected_prompt_text = selected_prompt_text
+        ##### End New Run Sidebar
         else:
-            st.warning("Please select a model to generate a suggested name.")
-        # End Naming Output
-        # 5. Begin Selection of Output File Format
-        st.subheader("5. Select File Format for Saving")
-        st.session_state.output_format = st.radio(
-            "Choose output format:",
-            ["JSON", "CSV", "TXT"],
-            help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
-        )
-        # End Selection of Output File Format
-        # 6. Process button - disable if no input is provided
-        process_button_disabled = (input_method == "Upload URLs File" and not uploaded_file) or \
-                                 (input_method == "Select Local Images" and not selected_local_images)
-        #process_button_disabled = False
-        process_button_clicked = st.button("Process Images", type="primary", disabled=process_button_disabled)
-        # End 6.
-        # persistance
-        st.session_state.selected_model = selected_model
-        st.session_state.model_name = model_name
-        st.session_state.selected_model_obj = selected_model_obj
-        st.session_state.selected_prompt_name = selected_prompt_name
-        st.session_state.selected_prompt_text = selected_prompt_text
+            # Complete Saved Run Sidebar
+            st.header("Complete Saved Run")
+            saved_runs = get_saved_runs()
+            if not saved_runs:
+                st.warning("No saved runs found.")
+                return
+            selected_run = st.selectbox("Select a saved run:", saved_runs)
+            if st.button("Load Run"):
+                load_saved_run(selected_run)
+                process_button_clicked = True
+                st.rerun()
+        
     # Main content area
     ## begin processing images
     st.session_state.progress_bar = st.progress(st.session_state.get("progress", 0))
@@ -688,7 +791,8 @@ def main():
         # Begin Processing Jobs
         st.session_state.progress = (st.session_state.jobs_dict["num_total_jobs"] - st.session_state.jobs_dict["num_remaining_jobs"]) / st.session_state.jobs_dict["num_total_jobs"]
         st.session_state.progress_bar.progress(st.session_state.get("progress", 0))
-        if st.session_state.jobs_dict["to_process"]:
+        st.session_state.pause_button_enabled = False#st.toggle(label="Pause", key="pause_button", value=False)
+        if st.session_state.jobs_dict["to_process"] and not st.session_state.pause_button_enabled:
             is_succcess = run_jobs()
     if st.session_state.error_flag:
         msg = st.session_state.results[-1]["message"]
@@ -697,7 +801,7 @@ def main():
         st.error("Error!!!")
         st.error(msg)
         proceed_option = st.radio("How to Proceeed?:", ["Pause", "Retry Failed and Remaining Jobs", "Substitute Blank Transcript and Finish Remaining Jobs", "Skip Failed Jobs and Finish Remaining Jobs", "Cancel All Jobs"], index=None, key="proceed_option", on_change=handle_proceed_option)
-    if st.session_state.results or st.session_state.show_results_override:
+    if st.session_state.results:
         # Begin Display Results
         st.header("Results")
         success_count = sum(1 for r in st.session_state.results if r["status"] == "success")
