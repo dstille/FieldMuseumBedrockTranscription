@@ -191,12 +191,12 @@ class BedrockImageProcessor(ImageProcessor):
 
 ####### Testing Module  #######
 import random
-RANDOM_ERROR_THRESHOLD = 0.5
+RANDOM_ERROR_THRESHOLD = 0.25
 SAMPLE_DIRECTORY  = "raw_llm_responses"
 SAMPLE_FILE = "nova/httpsfm-digital-assetsfieldmuseumorg2298823C0399179Fjpg-2025-05-31-1632-09-raw.json"
 
 class BedrockImageProcessorTesting(ImageProcessor):
-    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name, include_random_error=True):
+    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name, include_random_error=False):
         super().__init__(api_key, prompt_name, prompt_text, model, modelname, output_name)
         self.bedrock_client = boto3.client("bedrock-runtime")
         self.bedrock_mgmt = boto3.client("bedrock")
