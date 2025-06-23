@@ -6,6 +6,7 @@ Includes functions for file operations, JSON handling, and prompt conversions.
 
 import os
 import json
+import csv
 import re
 from pathlib import Path
 from typing import Dict, List, Any, Union, Optional
@@ -38,7 +39,32 @@ def get_fieldnames_from_prompt_text(prompt_text):
 
 def get_content(fname):
     with open(fname, 'r', encoding='utf-8') as f:
-        return f.read()       
+        return f.read()
+
+def get_content_csv(fname):
+    with open(fname, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
+def csv_to_transcriptions(fname):
+    data = get_content_csv(fname)
+    image_names = [row["imageName"] for row in data]
+    data_no_image_names = [{k: v for k, v in row.items() if k != "imageName"} for row in data]
+    return {image_name: data for image_name, data in zip(image_names, data_no_image_names)} 
+
+def convert_text_to_dict(text, fieldnames):
+    lines = striplines(text)
+    result = {fieldname: "" for fieldname in fieldnames}
+    for line in lines:
+        for fieldname in fieldnames:
+            if line.startswith(fieldname):
+                result[fieldname] = line.split(":", 1)[1].strip()
+    return result if any(result.values()) else {"error": text}        
+
+def text_to_transcriptions(text, prompt_text):
+    fieldnames = get_fieldnames_from_prompt_text(prompt_text)
+    d = convert_text_to_dict(text, fieldnames)
+    return d                         
 
 def ensure_directory_exists(directory: str) -> None:
     """
