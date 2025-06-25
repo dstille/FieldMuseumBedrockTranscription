@@ -12,6 +12,7 @@ import datetime
 import shutil
 from bedrock_interface import BedrockImageProcessor
 from bedrock_interface import create_image_processor
+from utilities.file_manager import FileManager
 from utilities import utils
 
 # directories
@@ -22,6 +23,7 @@ PROMPTS_DIR = "prompts"
 DATA_DIR = "data"
 MODEL_INFO_DIR = "model_info"
 UPLOAD_IMAGES_DIR = "images_to_upload"
+RECOVERY_DIR = "recovery"
 
 
 # constants
@@ -32,18 +34,12 @@ def initialize_variables():
         st.session_state.transcriptions = {}
     if 'results' not in st.session_state:
         st.session_state.results = []
-    if 'save_clicked' not in st.session_state:
-        st.session_state.save_clicked = False
     if 'save_completed' not in st.session_state:
         st.session_state.save_completed = False
-    if 'output_file_path' not in st.session_state:
-        st.session_state.output_file_path = ""
     if 'cost_data_path' not in st.session_state:
         st.session_state.cost_data_path = ""
     if 'cost_summary' not in st.session_state:
         st.session_state.cost_summary = {}
-    if 'file_extension' not in st.session_state:
-        st.session_state.file_extension = ""
     if 'volume_name' not in st.session_state:
         st.session_state.volume_name = ""
     if 'output_format' not in st.session_state:
@@ -62,8 +58,6 @@ def initialize_variables():
         st.session_state.proceed_option = None
     if 'try_failed_jobs' not in st.session_state:
         st.session_state.try_failed_jobs = False
-    if 'auto_save_enabled' not in st.session_state:               
-        st.session_state.auto_save_enabled = True
     if 'run_numbering' not in st.session_state:
         st.session_state.run_numbering = {}
     if 'time_start' not in st.session_state:
@@ -71,7 +65,11 @@ def initialize_variables():
     if 'pause_button_enabled' not in st.session_state:
         st.session_state.pause_button_enabled = False 
     if 'image_data' not in st.session_state:
-        st.session_state.image_data = {}                
+        st.session_state.image_data = {} 
+    if 'output_files' not in st.session_state:
+        st.session_state.output_files = []
+    if "chunk_size" not in st.session_state:
+        st.session_state.chunk_size = 1000                       
     
 def add_processing_data_to_image_data(source_identifier, processing_data):
     if source_identifier in st.session_state.image_data and processing_data:
@@ -116,7 +114,7 @@ def create_costs_summary():
     st.session_state.cost_summary = cost_summary        
 
 def create_directories():
-    for directory in [TEMP_IMAGES_DIR, TRANSCRIPTIONS_DIR, RAW_RESPONSES_DIR, DATA_DIR, MODEL_INFO_DIR, UPLOAD_IMAGES_DIR]:
+    for directory in [TEMP_IMAGES_DIR, TRANSCRIPTIONS_DIR, RAW_RESPONSES_DIR, DATA_DIR, MODEL_INFO_DIR, UPLOAD_IMAGES_DIR, RECOVERY_DIR]:
         ensure_directory_exists(directory)
 
 # Download image from URL and save to temp folder
@@ -146,7 +144,13 @@ def ensure_directory_exists(directory):
         os.makedirs(directory)
 
 def get_legal_filename(filename):
-    return re.sub(r'[\\/*?:]', "_", filename)        
+    return re.sub(r'[\\/*?:]', "_", filename)
+
+def get_max_chunk_size(uploaded_file, selected_local_images):
+    if uploaded_file:   
+        urls = uploaded_file.getvalue().decode("utf-8").splitlines()
+        return len(urls)  
+    return len(selected_local_images) or st.session_state.chunk_size      
 
 def get_raw_llm_response(image_name):
     legal_image_name = get_legal_filename(image_name)
@@ -228,6 +232,8 @@ def load_job(job: dict):
     st.session_state.jobs_dict["to_process"].append(job)
     st.session_state.jobs_dict["incomplete"].append(job[1])
 
+# images_names, chunk_size, run_name, output_format    
+
 def load_jobs_from_local_images(local_image_paths):
     for local_path in local_image_paths:
         filename = os.path.basename(local_path)
@@ -284,7 +290,6 @@ def load_prompts():
 def load_saved_data(data_filename):
     with open(os.path.join(DATA_DIR, data_filename), "r") as f:
         data = json.load(f)
-    st.session_state.run_numbering = data["run_numbering"]
     st.session_state.time_start = get_timestamp()
     st.session_state.selected_model = data["model"]["id"]
     st.session_state.selected_model_obj = data["model"]["id"]
@@ -295,24 +300,24 @@ def load_saved_data(data_filename):
     st.session_state.selected_prompt_text = prompt_text
     st.session_state.image_data = data["images"]
     missing_transcriptions = data["incomplete_jobs"]
-    return missing_transcriptions
+    associated_transcription_filenames = data["associated_transcription_files"]
+    st.session_state.volume_name = data["run_id"]
+    st.session_state.output_format = associated_transcription_filenames[0].split(".")[-1].upper()
+    st.session_state.chunk_size = data["run_numbering"]["chunk_size"]
+    st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+    st.session_state.run_numbering = st.session_state.file_manager.load_run_numbering(data["run_numbering"])    
+    return missing_transcriptions, associated_transcription_filenames
 
-def load_saved_transcriptions(transcription_filename_no_ext):
-    for file in os.listdir(TRANSCRIPTIONS_DIR):
-        if file.startswith(transcription_filename_no_ext):
-            file_path = os.path.join(TRANSCRIPTIONS_DIR, file)
-            st.session_state.output_format = file_path.split(".")[-1].upper()
-            st.session_state.volume_name = get_volume_name(st.session_state.model_name)
-            return convert_data_to_transcriptions(file_path)           
+def load_saved_transcriptions(associated_transcription_filenames):
+    transcriptions = {}
+    for filepath in associated_transcription_filenames:
+        transcriptions = transcriptions | convert_data_to_transcriptions(filepath) 
+    return transcriptions        
 
 def load_saved_run(data_filename):
-    missing_transcriptions = load_saved_data(data_filename)
-    transcription_filename_no_ext = data_filename.split("-data")[0] + "-transcription"
-    st.session_state.transcriptions = load_saved_transcriptions(transcription_filename_no_ext)
+    missing_transcriptions, associated_transcription_filenames = load_saved_data(data_filename)
+    st.session_state.transcriptions = load_saved_transcriptions(associated_transcription_filenames)
     return missing_transcriptions    
-
-def number_images(image_names):
-    st.session_state.run_numbering = {image_name: {"imageNumber": idx + 1, "numberAttempts": 0, "hasTranscription": False} for idx, image_name in enumerate(image_names)}       
 
 # Define the common image processing function
 def process_single_image(img_path, source_identifier, item_index):
@@ -418,8 +423,7 @@ def run_jobs():
             jobs["in_process"] = ()
             jobs["msg"] = st.session_state.results[-1]
             st.session_state.error_flag = True
-            if st.session_state.auto_save_enabled:
-                save_transcriptions_callback()
+            save_transcription(orig_filename)
             return False
         jobs["completed"].append(orig_filename)
         if orig_filename in jobs["incomplete"]:
@@ -427,13 +431,12 @@ def run_jobs():
         jobs["msg"] = st.session_state.results[-1]
         jobs["in_process"] = ()        
         jobs["num_remaining_jobs"] -= 1
-        if st.session_state.auto_save_enabled:
-                save_transcriptions_callback()    
+        save_transcription(orig_filename)    
     st.session_state.error_flag = False          
     return True
 
 def save_cost_data(volume_name, model_id, model_name, results, prompt_name, image_data):
-    associated_transcription_filename = f"{volume_name}-transcription.{st.session_state.output_format.lower()}"
+    associated_transcription_filenames = st.session_state.output_files
     os.makedirs(DATA_DIR, exist_ok=True)
     filename = f"{DATA_DIR}/{volume_name}-data.json"
     # Calculate total tokens and costs
@@ -455,7 +458,7 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
     # Create the cost data structure
     cost_data = {
         "run_id": volume_name,
-        "associated_transcription_file": associated_transcription_filename,
+        "associated_transcription_files": associated_transcription_filenames,
         "timestamp": datetime.datetime.now().isoformat(),
         "time_start": st.session_state.time_start,
         "model": {
@@ -491,95 +494,21 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
         st.error(f"Error saving cost data: {str(e)}")
     return filename, cost_data
 
-def save_transcriptions_callback():
-    output_file_path = ""
-    volume_name = st.session_state.volume_name
+def save_transcription(image_name):
     try:
-        if st.session_state.output_format == "JSON":
-            output_file_path = save_transcriptions_json(st.session_state.transcriptions, volume_name)
-        elif st.session_state.output_format == "TXT":
-            output_file_path = save_transcriptions_txt(st.session_state.transcriptions, volume_name)
-        elif st.session_state.output_format == "CSV":
-            output_file_path = save_transcriptions_csv(st.session_state.transcriptions, volume_name)
-        print(f"File saved successfully: {output_file_path}")
-        st.session_state.output_file_path = output_file_path
-        st.session_state.save_completed = True
-        # Don't rerun the app, just set a flag to show success message
-        st.session_state.show_save_success = True
+        filepath, is_saved = st.session_state.file_manager.save_transcription(image_name, st.session_state.transcriptions)
+        st.session_state.save_completed = is_saved
+        st.session_state.show_save_success = is_saved
+        if is_saved and filepath not in st.session_state.output_files:
+            st.session_state.output_files.append(filepath)
     except Exception as e:
         print(f"Error in save_transcriptions_callback: {str(e)}")
         st.error(f"Error saving files: {str(e)}")
         st.session_state.show_save_error = str(e)
-  
-def save_transcriptions_csv(transcriptions, volume_name):
-    filename = f"{TRANSCRIPTIONS_DIR}/{volume_name}-transcription.csv"
-    try:
-        fieldnames = ["imageName"]  # Start with image_name as the first field
-        for image_name, data in transcriptions.items():
-            if isinstance(data, dict):
-                for key in data.keys():
-                    if key not in fieldnames:
-                        fieldnames.append(key)
-            else:
-                # If transcription is not a dict, add it as a single field
-                if "transcription" not in fieldnames:
-                    fieldnames.append("transcription")
-        # Write the CSV file
-        with open(filename, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            for image_name, data in transcriptions.items():
-                for fieldname, val in data.items():
-                    data[fieldname] = val.replace('\n', ' ').replace('\r', ' ')
-                data = {"imageName": image_name} | data
-                writer.writerow(data)
-        print(f"Successfully saved CSV transcriptions to {filename}")
-    except Exception as e:
-        print(f"Error saving CSV transcriptions: {str(e)}")
-        st.error(f"Error saving CSV transcriptions: {str(e)}")
-    return filename
-
-def save_transcriptions_json(transcriptions, volume_name):
-    filename = f"{TRANSCRIPTIONS_DIR}/{volume_name}-transcription.json"
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(transcriptions, f, indent=2, ensure_ascii=False)
-        print(f"Successfully saved JSON transcriptions to {filename}")
-    except Exception as e:
-        print(f"Error saving JSON transcriptions: {str(e)}")
-        st.error(f"Error saving JSON transcriptions: {str(e)}")
-    return filename
-
-def save_transcriptions_txt(transcriptions, volume_name):
-    filename = f"{TRANSCRIPTIONS_DIR}/{volume_name}-transcription.txt"
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            for i, (image_name, data) in enumerate(transcriptions.items()):
-                if i > 0:
-                    f.write("\n\n")
-                # Add header separator
-                f.write("=" * 50 + "\n")
-                f.write(f"imageName: {image_name}\n\n")
-                transcription_data = {}
-                if isinstance(data, dict):
-                    transcription_data = data
-                else:
-                    transcription_data = {"transcription": data}
-                for key, value in transcription_data.items():
-                    formatted_value = str(value).strip()
-                    f.write(f"{key}: {formatted_value}\n")
-                # Add footer separator
-                f.write("\n" + "=" * 50)
-        print(f"Successfully saved TXT transcriptions to {filename}")
-    except Exception as e:
-        print(f"Error saving TXT transcriptions: {str(e)}")
-        st.error(f"Error saving TXT transcriptions: {str(e)}")
-    return filename
 
 def set_start_time():
     if "start_time" not in st.session_state:
         st.session_state.start_time_str = get_timestamp()    
-
 
 def main():
     st.set_page_config(
@@ -595,8 +524,7 @@ def main():
             del st.session_state[key]
         st.success("App reset successfully!")
         st.rerun()
-    set_start_time()    
-    st.session_state.auto_save_enabled = st.toggle(label="Auto Save", key="auto_save_option", value=True)    
+    set_start_time()
     all_models = load_models()
     prompts = load_prompts()
     with st.sidebar:
@@ -687,21 +615,24 @@ def main():
                 if not available_images:
                     st.warning(f"No images found in the {UPLOAD_IMAGES_DIR} folder. Please add some images and refresh.")
                 else:
-                    selected_local_images = st.multiselect(
-                        "Select images to process:",
-                        available_images,
-                        help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
-                    )
+                    print(f"{available_images = }")
+                    # initialize toggle to false
+                    if st.toggle(f"Select all images in the {UPLOAD_IMAGES_DIR} folder", value=False):
+                        selected_local_images = available_images
+                    else:    
+                        selected_local_images = st.multiselect(
+                            "Select images to process:",
+                            available_images,
+                            help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
+                        )  
             # End Input Method Selection
             # 4. Begin Naming Output
-            st.subheader("4. Name Output")
+            st.subheader("4. Name Output File")
             if selected_model:
                 model_name = selected_model.split(':')[0]
                 suggested_volume_name = get_volume_name(model_name)
                 suggested_volume_name = get_legal_filename(suggested_volume_name)
                 # Allow user to edit the volume name
-                st.warning("Suggested Output Name:")
-                st.info(suggested_volume_name)
                 volume_name = st.text_input(
                     "You May Edit the Name Below. 'Enter' to Accept Changes",
                     value=suggested_volume_name,
@@ -709,9 +640,9 @@ def main():
                     key="volume_name_input"
                 )
                 st.session_state.volume_name = volume_name
-                st.write("Look For") 
+                st.write("Look For the Transcription Folder:") 
                 st.success(f"'transcriptions/{volume_name}-transcription'")
-                st.write("  And")
+                st.write("  And the Data File:")
                 st.success(f"'data/{volume_name}-data'")
 
             else:
@@ -719,11 +650,17 @@ def main():
             # End Naming Output
             # 5. Begin Selection of Output File Format
             st.subheader("5. Select File Format for Saving")
-            st.session_state.output_format = st.radio(
-                "Choose output format:",
-                ["JSON", "CSV", "TXT"],
-                help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
-            )
+            max_chunk_size = get_max_chunk_size(uploaded_file, selected_local_images)
+            if max_chunk_size == 1:
+                st.session_state.chunk_size = max_chunk_size
+            else:    
+                chunk_size = st.slider("Adjust Number Transcriptions per Output File", 1, max_chunk_size, max_chunk_size)
+                st.session_state.chunk_size = chunk_size
+                st.session_state.output_format = st.radio(
+                    "Choose output format:",
+                    ["JSON", "CSV", "TXT"],
+                    help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
+                )
             # End Selection of Output File Format
             # 6. Process button - disable if no input is provided
             process_button_disabled = (input_method == "Upload URLs File" and not uploaded_file) or \
@@ -770,7 +707,8 @@ def main():
             if input_method == "Upload URLs File" and uploaded_file is not None:
                 urls = uploaded_file.getvalue().decode("utf-8").splitlines()
                 urls = [url.strip() for url in urls if url.strip()]
-                number_images(urls)
+                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(urls, st.session_state.chunk_size)
                 if not urls:
                     st.error("No URLs found in the uploaded file.")
                     return
@@ -778,7 +716,8 @@ def main():
                 st.info(f"Processing {len(urls)} images from URLs...")
             # create list of local image paths
             elif input_method == "Select Local Images" and selected_local_images:
-                number_images(selected_local_images)
+                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(selected_local_images, st.session_state.chunk_size)
                 local_image_paths = [os.path.join(UPLOAD_IMAGES_DIR, img) for img in selected_local_images]
                 has_valid_input = True
                 st.info(f"Processing {len(local_image_paths)} local images...")
@@ -857,8 +796,6 @@ def main():
         # Begin Save Results
     if st.session_state.transcriptions:
         create_costs_summary()
-        st.subheader("Save Transcriptions")
-        save_btn = st.button("Save Transcriptions", key="save_button", on_click=save_transcriptions_callback)
         # Display cost summary
         st.subheader("Cost Summary")
         col1, col2, col3 = st.columns(3)
@@ -871,7 +808,8 @@ def main():
         # After displaying the results, check if files were saved
     if "save_completed" in st.session_state and st.session_state.save_completed:
         if "show_save_success" in st.session_state and st.session_state.show_save_success:
-            st.success(f"All transcriptions saved to: {st.session_state.output_file_path}")
+            for filename in st.session_state.output_files:
+                st.success(f"File saved successfully: {filename}")
             st.success(f"Cost data saved to: {st.session_state.cost_data_path}")
             
             
