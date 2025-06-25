@@ -615,11 +615,16 @@ def main():
                 if not available_images:
                     st.warning(f"No images found in the {UPLOAD_IMAGES_DIR} folder. Please add some images and refresh.")
                 else:
-                    selected_local_images = st.multiselect(
-                        "Select images to process:",
-                        available_images,
-                        help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
-                    )
+                    print(f"{available_images = }")
+                    # initialize toggle to false
+                    if st.toggle(f"Select all images in the {UPLOAD_IMAGES_DIR} folder", value=False):
+                        selected_local_images = available_images
+                    else:    
+                        selected_local_images = st.multiselect(
+                            "Select images to process:",
+                            available_images,
+                            help=f"Select one or more images from the {UPLOAD_IMAGES_DIR} folder"
+                        )  
             # End Input Method Selection
             # 4. Begin Naming Output
             st.subheader("4. Name Output File")
@@ -646,13 +651,16 @@ def main():
             # 5. Begin Selection of Output File Format
             st.subheader("5. Select File Format for Saving")
             max_chunk_size = get_max_chunk_size(uploaded_file, selected_local_images)
-            chunk_size = st.slider("Adjust Number Transcriptions per Output File", 1, max_chunk_size, max_chunk_size)
-            st.session_state.chunk_size = chunk_size
-            st.session_state.output_format = st.radio(
-                "Choose output format:",
-                ["JSON", "CSV", "TXT"],
-                help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
-            )
+            if max_chunk_size == 1:
+                st.session_state.chunk_size = max_chunk_size
+            else:    
+                chunk_size = st.slider("Adjust Number Transcriptions per Output File", 1, max_chunk_size, max_chunk_size)
+                st.session_state.chunk_size = chunk_size
+                st.session_state.output_format = st.radio(
+                    "Choose output format:",
+                    ["JSON", "CSV", "TXT"],
+                    help="JSON: Structured data format\nCSV: Spreadsheet format\nTEXT: a single plain text file"
+                )
             # End Selection of Output File Format
             # 6. Process button - disable if no input is provided
             process_button_disabled = (input_method == "Upload URLs File" and not uploaded_file) or \
