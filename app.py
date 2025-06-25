@@ -23,10 +23,11 @@ PROMPTS_DIR = "prompts"
 DATA_DIR = "data"
 MODEL_INFO_DIR = "model_info"
 UPLOAD_IMAGES_DIR = "images_to_upload"
+RECOVERY_DIR = "recovery"
 
 
 # constants
-TESTING_MODE = True
+TESTING_MODE = False
 
 def initialize_variables():
     if 'transcriptions' not in st.session_state:
@@ -113,7 +114,7 @@ def create_costs_summary():
     st.session_state.cost_summary = cost_summary        
 
 def create_directories():
-    for directory in [TEMP_IMAGES_DIR, TRANSCRIPTIONS_DIR, RAW_RESPONSES_DIR, DATA_DIR, MODEL_INFO_DIR, UPLOAD_IMAGES_DIR]:
+    for directory in [TEMP_IMAGES_DIR, TRANSCRIPTIONS_DIR, RAW_RESPONSES_DIR, DATA_DIR, MODEL_INFO_DIR, UPLOAD_IMAGES_DIR, RECOVERY_DIR]:
         ensure_directory_exists(directory)
 
 # Download image from URL and save to temp folder
@@ -149,7 +150,7 @@ def get_max_chunk_size(uploaded_file, selected_local_images):
     if uploaded_file:   
         urls = uploaded_file.getvalue().decode("utf-8").splitlines()
         return len(urls)  
-    return len(selected_local_images) or 1      
+    return len(selected_local_images) or st.session_state.chunk_size      
 
 def get_raw_llm_response(image_name):
     legal_image_name = get_legal_filename(image_name)
@@ -289,7 +290,6 @@ def load_prompts():
 def load_saved_data(data_filename):
     with open(os.path.join(DATA_DIR, data_filename), "r") as f:
         data = json.load(f)
-    st.session_state.run_numbering = data["run_numbering"]
     st.session_state.time_start = get_timestamp()
     st.session_state.selected_model = data["model"]["id"]
     st.session_state.selected_model_obj = data["model"]["id"]
@@ -301,12 +301,17 @@ def load_saved_data(data_filename):
     st.session_state.image_data = data["images"]
     missing_transcriptions = data["incomplete_jobs"]
     associated_transcription_filenames = data["associated_transcription_files"]
+    st.session_state.volume_name = data["run_id"]
+    st.session_state.output_format = associated_transcription_filenames[0].split(".")[-1].upper()
+    st.session_state.chunk_size = data["run_numbering"]["chunk_size"]
+    st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+    st.session_state.run_numbering = st.session_state.file_manager.load_run_numbering(data["run_numbering"])    
     return missing_transcriptions, associated_transcription_filenames
 
 def load_saved_transcriptions(associated_transcription_filenames):
-    st.session_state.volume_name = get_volume_name(st.session_state.model_name)
-    st.session_state.output_format = associated_transcription_filenames[0].split(".")[-1].upper()
-    transcriptions = {convert_data_to_transcriptions(file_path) for file_path in associated_transcription_filenames}  
+    transcriptions = {}
+    for filepath in associated_transcription_filenames:
+        transcriptions = transcriptions | convert_data_to_transcriptions(filepath) 
     return transcriptions        
 
 def load_saved_run(data_filename):
@@ -684,7 +689,6 @@ def main():
     ## begin processing images
     st.session_state.progress_bar = st.progress(st.session_state.get("progress", 0))
     status_text = st.empty()
-    st.session_state.chunk_size = 2
     if process_button_clicked:
         st.success("Processing started...")
         if st.session_state.task_option == "New Run":
@@ -695,8 +699,8 @@ def main():
             if input_method == "Upload URLs File" and uploaded_file is not None:
                 urls = uploaded_file.getvalue().decode("utf-8").splitlines()
                 urls = [url.strip() for url in urls if url.strip()]
-                st.session_state.file_manager = FileManager(urls, st.session_state.chunk_size, st.session_state.volume_name, st.session_state.output_format)
-                st.session_state.run_numbering = st.session_state.file_manager.run_numbering
+                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(urls, st.session_state.chunk_size)
                 if not urls:
                     st.error("No URLs found in the uploaded file.")
                     return
@@ -704,8 +708,8 @@ def main():
                 st.info(f"Processing {len(urls)} images from URLs...")
             # create list of local image paths
             elif input_method == "Select Local Images" and selected_local_images:
-                st.session_state.file_manager = FileManager(selected_local_images, st.session_state.chunk_size, st.session_state.volume_name, st.session_state.output_format)
-                st.session_state.run_numbering = st.session_state.file_manager.run_numbering
+                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
+                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(selected_local_images, st.session_state.chunk_size)
                 local_image_paths = [os.path.join(UPLOAD_IMAGES_DIR, img) for img in selected_local_images]
                 has_valid_input = True
                 st.info(f"Processing {len(local_image_paths)} local images...")

@@ -2,17 +2,31 @@ import re
 import json
 import csv
 import os
+import time
 
 class FileManager:
-    def __init__(self, image_names, chunk_size, run_name, output_format):
-        self.image_names = image_names
-        self.chunk_size = chunk_size
+    def __init__(self, run_name, output_format):
         self.run_name = run_name
-        self.output_format = output_format.lower()
+        self.output_format = "." + output_format.lower()
         self.run_folder = f"transcriptions/{run_name}"
         self.ensure_directory_exists(self.run_folder)
-        self.number_images()
+        self.recovery_folder = f"recovery/{run_name}"
+        self.ensure_directory_exists(self.recovery_folder)
+        self.recovery_time = f"@{self.get_timestamp()}"
 
+    def set_run_numbering(self, image_names, chunk_size):
+        self.image_names = image_names
+        self.chunk_size = chunk_size
+        self.number_images()
+        return self.run_numbering
+
+    def load_run_numbering(self, run_numbering):
+        self.chunk_size = run_numbering["chunk_size"]
+        self.image_names = [key for key in run_numbering.keys() if key != "chunk_size"]
+        self.run_numbering = run_numbering
+        #self.set_destination_files()
+        return self.run_numbering
+    
     def ensure_directory_exists(self, directory):
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -21,7 +35,10 @@ class FileManager:
         start = chunk_number * self.chunk_size
         end = min(start + self.chunk_size, len(self.image_names))
         return self.image_names[start:end]
-       
+
+    def get_timestamp(self):
+        return time.strftime("%Y-%m-%d-%H%M")
+    
     def number_images(self):
         self.run_numbering = {image_name: {"imageNumber": idx + 1, "numberAttempts": 0, "hasTranscription": False, "destination_file": None, "is_saved": False} for idx, image_name in enumerate(self.image_names)}
         self.set_destination_files()
@@ -30,14 +47,19 @@ class FileManager:
         chunk_number = self.run_numbering[image_name]["chunk_number"]
         destination_file = self.run_numbering[image_name]["destination_file"]
         filepath = f"{self.run_folder}/{destination_file}"
+        recovery_file = destination_file.replace(self.output_format, f"{self.recovery_time}{self.output_format}")
+        recovery_filepath = f"{self.recovery_folder}/{recovery_file}"
         images_in_chunk = self.get_chunk(chunk_number)
         transcriptions_to_save = {image_name: transcriptions[image_name] for image_name in images_in_chunk if image_name in transcriptions}
-        if self.output_format == "json":
+        if self.output_format == ".json":
             self.run_numbering[image_name]["is_saved"] = self.save_transcriptions_json(transcriptions_to_save, filepath)
-        elif self.output_format == "csv":
+            self.save_transcriptions_json(transcriptions_to_save, recovery_filepath)
+        elif self.output_format == ".csv":
             self.run_numbering[image_name]["is_saved"] = self.save_transcriptions_csv(transcriptions_to_save, filepath)
+            self.save_transcriptions_csv(transcriptions_to_save, recovery_filepath)
         else:
             self.run_numbering[image_name]["is_saved"] = self.save_transcriptions_txt(transcriptions_to_save, filepath)
+            self.save_transcriptions_txt(transcriptions_to_save, recovery_filepath)
         return filepath, self.run_numbering[image_name]["is_saved"]
     
     def save_transcriptions_csv(self, transcriptions, filepath):
@@ -103,13 +125,14 @@ class FileManager:
             return False
         
     def set_destination_files(self):
+        self.run_numbering["chunk_size"] = self.chunk_size
         chunks = [self.get_chunk(i) for i in range((len(self.image_names) - 1) // self.chunk_size + 1)]
         for idx, chunk in enumerate(chunks):
             beginning_number = self.run_numbering[chunk[0]]["imageNumber"]
             end_number = self.run_numbering[chunk[-1]]["imageNumber"]
             for image_name in chunk:
                 self.run_numbering[image_name]["chunk_number"] = idx
-                self.run_numbering[image_name]["destination_file"] = f"{self.run_name}-transcriptions#{beginning_number}-{end_number}#.{self.output_format}"
+                self.run_numbering[image_name]["destination_file"] = f"{self.run_name}-transcriptions#{beginning_number}-{end_number}#{self.output_format}"
 ###############
 
             
