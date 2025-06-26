@@ -50,7 +50,8 @@ class FileManager:
         recovery_file = destination_file.replace(self.output_format, f"{self.recovery_time}{self.output_format}")
         recovery_filepath = f"{self.recovery_folder}/{recovery_file}"
         images_in_chunk = self.get_chunk(chunk_number)
-        transcriptions_to_save = {image_name: transcriptions[image_name] for image_name in images_in_chunk if image_name in transcriptions}
+        sorted_image_names = sorted(images_in_chunk, key=lambda x: self.run_numbering[x]["imageNumber"])
+        transcriptions_to_save = {image_name: transcriptions[image_name] for image_name in sorted_image_names if image_name in transcriptions}
         if self.output_format == ".json":
             self.run_numbering[image_name]["is_saved"] = self.save_transcriptions_json(transcriptions_to_save, filepath)
             self.save_transcriptions_json(transcriptions_to_save, recovery_filepath)

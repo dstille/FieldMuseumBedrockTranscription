@@ -304,7 +304,7 @@ class BedrockImageProcessorTesting(ImageProcessor):
             text = self.extract_text(response_body)
             raw_response = self.save_raw_response(response_body, image_name)
             if self.include_random_error and random.random() < RANDOM_ERROR_THRESHOLD:
-                raise Exception("Hypothetical Random Error Occurred")
+                raise Exception("Hypothetical Random Throttling Error Occurred")
             time_elapsed = (time.time() - start_time) / 60  # in minutes
             processing_data = self.get_transcript_processing_data(time_elapsed)
             self.num_processed += 1    
