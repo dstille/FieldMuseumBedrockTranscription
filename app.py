@@ -69,7 +69,9 @@ def initialize_variables():
     if 'output_files' not in st.session_state:
         st.session_state.output_files = []
     if "chunk_size" not in st.session_state:
-        st.session_state.chunk_size = 1000                       
+        st.session_state.chunk_size = 1000
+    if "ignore_throttling_errors" not in st.session_state:
+        st.session_state.ignore_throttling_errors = False                           
     
 def add_processing_data_to_image_data(source_identifier, processing_data):
     if source_identifier in st.session_state.image_data and processing_data:
@@ -101,15 +103,7 @@ def convert_data_to_transcriptions(file_path):
     return {}           
 
 def create_costs_summary():
-    volume_name = st.session_state.volume_name
-    cost_data_path, cost_summary = save_cost_data(
-            volume_name, 
-            st.session_state.selected_model, 
-            st.session_state.model_name, 
-            st.session_state.results, 
-            st.session_state.selected_prompt_name,
-            st.session_state.image_data
-        )
+    cost_data_path, cost_summary = save_cost_data()
     st.session_state.cost_data_path = cost_data_path
     st.session_state.cost_summary = cost_summary        
 
@@ -150,7 +144,13 @@ def get_max_chunk_size(uploaded_file, selected_local_images):
     if uploaded_file:   
         urls = uploaded_file.getvalue().decode("utf-8").splitlines()
         return len(urls)  
-    return len(selected_local_images) or st.session_state.chunk_size      
+    return len(selected_local_images) or st.session_state.chunk_size
+
+def get_proceed_options(msg):
+    proceed_options = ["Pause", "Retry Failed and Remaining Jobs", "Substitute Blank Transcript and Finish Remaining Jobs", "Skip Failed Jobs and Finish Remaining Jobs", "Cancel All Jobs"]
+    if "throttling" in msg.lower():
+        proceed_options.append("Substitute Blank Transcript for ALL THROTTLING ERRORS")
+    return proceed_options          
 
 def get_raw_llm_response(image_name):
     legal_image_name = get_legal_filename(image_name)
@@ -181,6 +181,7 @@ def handle_proceed_option():
     st.session_state.proceed_option = None
     if proceed_option == "Pause":
         st.write("Pausing....")
+        st.session_state.ignore_throttling_errors = False  
         return
     st.session_state.error_flag = False
     # remove failed transcripts
@@ -189,7 +190,16 @@ def handle_proceed_option():
     failed_filenames = [job[1] for job in failed_jobs]
     for orig_filename in failed_filenames:
         if st.session_state.transcriptions and orig_filename in st.session_state.transcriptions:
-            del st.session_state.transcriptions[orig_filename]  
+            del st.session_state.transcriptions[orig_filename]
+    if proceed_option == "Substitute Blank Transcript and Finish Remaining Jobs":
+        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
+        for orig_filename in failed_filenames:
+            st.session_state.transcriptions[orig_filename] = blank_transcript
+            st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
+        st.session_state.jobs_dict["failed"] = []
+        st.session_state.try_failed_jobs = False
+        return run_jobs()
+    st.session_state.ignore_throttling_errors = False                 
     if proceed_option == "Skip Failed Jobs and Finish Remaining Jobs":
         st.write("Skipping Failed Jobs and Finishing Remaining Jobs...")
         st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
@@ -207,7 +217,16 @@ def handle_proceed_option():
     elif proceed_option == "Retry Failed and Remaining Jobs":
         st.write("Retrying Failed Jobs...")
         st.session_state.try_failed_jobs = True
-        return run_jobs() 
+        return run_jobs()
+    elif proceed_option == "Substitute Blank Transcript for ALL THROTTLING ERRORS":
+        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
+        for orig_filename in failed_filenames:
+            st.session_state.transcriptions[orig_filename] = blank_transcript
+            st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
+        st.session_state.jobs_dict["failed"] = []
+        st.session_state.try_failed_jobs = False
+        st.session_state.ignore_throttling_errors = True
+        return run_jobs()
     elif proceed_option == "Cancel All Jobs":
         st.write("Cancelling...")
         st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
@@ -382,6 +401,9 @@ def process_single_image(img_path, source_identifier, item_index):
             error_msg += "\nQuota exceeded: You have reached your usage limit for this model."
         else:
             error_msg += "\nUnknown error: An unexpected error occurred."
+        if processing_data:
+            if "input cost $" in processing_data and processing_data["input cost $"] > 0.0:
+                error_msg = f"WARNING!!! CHARGES WERE ACCRUED DURING THIS FAILED JOB:\n{processing_data = }" + msg 
         st.session_state.results.append({
             "imageName": source_identifier,
             "status": "error",
@@ -435,7 +457,13 @@ def run_jobs():
     st.session_state.error_flag = False          
     return True
 
-def save_cost_data(volume_name, model_id, model_name, results, prompt_name, image_data):
+def save_cost_data():
+    volume_name = st.session_state.volume_name
+    model_id = st.session_state.selected_model 
+    model_name = st.session_state.model_name 
+    results = st.session_state.results 
+    prompt_name = st.session_state.selected_prompt_name
+    image_data = st.session_state.image_data
     associated_transcription_filenames = st.session_state.output_files
     os.makedirs(DATA_DIR, exist_ok=True)
     filename = f"{DATA_DIR}/{volume_name}-data.json"
@@ -475,8 +503,6 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
         "prompt": prompt_name,
         "images_processed": len([r for r in st.session_state.results if r["status"] == "success"]),
         "images_failed": len([r for r in st.session_state.results if r["status"] == "error"]),
-        "completed_jobs": completed_jobs,
-        "incomplete_jobs": incomplete_jobs,
         "tokens": {
             "input": total_input_tokens,
             "output": total_output_tokens,
@@ -491,6 +517,8 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
     }
     cost_data["images"] = image_data
     cost_data["run_numbering"] = st.session_state.run_numbering
+    cost_data["completed_jobs"] = completed_jobs
+    cost_data["incomplete_jobs"] = incomplete_jobs
     # Save the cost data to the JSON file
     try:
         with open(filename, "w", encoding="utf-8") as f:
@@ -506,8 +534,10 @@ def save_transcription(image_name):
         filepath, is_saved = st.session_state.file_manager.save_transcription(image_name, st.session_state.transcriptions)
         st.session_state.save_completed = is_saved
         st.session_state.show_save_success = is_saved
-        if is_saved and filepath not in st.session_state.output_files:
-            st.session_state.output_files.append(filepath)
+        if is_saved:
+            save_cost_data()
+            if filepath not in st.session_state.output_files:
+                st.session_state.output_files.append(filepath)
     except Exception as e:
         print(f"Error in save_transcriptions_callback: {str(e)}")
         st.error(f"Error saving files: {str(e)}")
@@ -748,7 +778,33 @@ def main():
         print(f"{msg = }")
         st.error("Error!!!")
         st.error(msg)
-        proceed_option = st.radio("How to Proceeed?:", ["Pause", "Retry Failed and Remaining Jobs", "Substitute Blank Transcript and Finish Remaining Jobs", "Skip Failed Jobs and Finish Remaining Jobs", "Cancel All Jobs"], index=None, key="proceed_option", on_change=handle_proceed_option)
+        proceed_options = get_proceed_options(msg)
+        if "Substitute Blank Transcript for ALL THROTTLING ERRORS" and st.session_state.ignore_throttling_errors:
+            st.session_state.proceed_option = "Substitute Blank Transcript for ALL THROTTLING ERRORS"
+            handle_proceed_option()
+            st.rerun()
+        else:
+            proceed_option = st.radio("How to Proceeed?:", proceed_options, index=None, key="proceed_option", on_change=handle_proceed_option)
+    # Begin Display Costs
+    if st.session_state.transcriptions:
+        create_costs_summary()
+        # Display cost summary
+        st.subheader("Cost Summary")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")
+        with col2:
+            st.metric("Total Tokens", f"{st.session_state.cost_summary['tokens']['total']:,}")
+        with col3:
+            st.metric("Processing Time", f"{st.session_state.cost_summary['processing_time_minutes']:.2f} min")
+        # After displaying the results, check if files were saved
+    if "save_completed" in st.session_state and st.session_state.save_completed:
+        if "show_save_success" in st.session_state and st.session_state.show_save_success:
+            for filename in st.session_state.output_files:
+                st.success(f"File saved successfully: {filename}")
+            st.success(f"Cost data saved to: {st.session_state.cost_data_path}")
+    # End Display Costs       
+    # Begin Display Results                
     if st.session_state.results:
         # Begin Display Results
         st.header("Results")
@@ -800,26 +856,8 @@ def main():
                         st.write(raw_llm_response)
                     
         # End Display Results
-        # Begin Save Results
-    if st.session_state.transcriptions:
-        create_costs_summary()
-        # Display cost summary
-        st.subheader("Cost Summary")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")
-        with col2:
-            st.metric("Total Tokens", f"{st.session_state.cost_summary['tokens']['total']:,}")
-        with col3:
-            st.metric("Processing Time", f"{st.session_state.cost_summary['processing_time_minutes']:.2f} min")
-        # After displaying the results, check if files were saved
-    if "save_completed" in st.session_state and st.session_state.save_completed:
-        if "show_save_success" in st.session_state and st.session_state.show_save_success:
-            for filename in st.session_state.output_files:
-                st.success(f"File saved successfully: {filename}")
-            st.success(f"Cost data saved to: {st.session_state.cost_data_path}")
-            
-            
+        
+    
 if __name__ == "__main__":
     initialize_variables()
     main()
