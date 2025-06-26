@@ -144,7 +144,7 @@ def ensure_directory_exists(directory):
         os.makedirs(directory)
 
 def get_legal_filename(filename):
-    return re.sub(r'[\\/*?:]', "_", filename)
+    return re.sub(r'[\\/*?: ]', "_", filename)
 
 def get_max_chunk_size(uploaded_file, selected_local_images):
     if uploaded_file:   
@@ -446,6 +446,13 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
     total_output_cost = 0.0
     total_time = 0.0
     image_costs = {}
+
+    incomplete_jobs, completed_jobs = [], []
+    for image_name in st.session_state.file_manager.image_names:
+        if st.session_state.run_numbering[image_name]["hasTranscription"]:
+            completed_jobs.append(image_name)
+        else:
+            incomplete_jobs.append(image_name)
     
     # Extract processing data from successful results
     for data in image_data.values():
@@ -468,8 +475,8 @@ def save_cost_data(volume_name, model_id, model_name, results, prompt_name, imag
         "prompt": prompt_name,
         "images_processed": len([r for r in st.session_state.results if r["status"] == "success"]),
         "images_failed": len([r for r in st.session_state.results if r["status"] == "error"]),
-        "completed_jobs": st.session_state.jobs_dict["completed"],
-        "incomplete_jobs": st.session_state.jobs_dict["incomplete"],
+        "completed_jobs": completed_jobs,
+        "incomplete_jobs": incomplete_jobs,
         "tokens": {
             "input": total_input_tokens,
             "output": total_output_tokens,
@@ -639,7 +646,7 @@ def main():
                     help="You can use the suggested name or enter your own",
                     key="volume_name_input"
                 )
-                st.session_state.volume_name = volume_name
+                st.session_state.volume_name = get_legal_filename(volume_name)
                 st.write("Look For the Transcription Folder:") 
                 st.success(f"'transcriptions/{volume_name}-transcription'")
                 st.write("  And the Data File:")
