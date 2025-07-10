@@ -1,50 +1,26 @@
 {
   "amazon": {
-    "titan_text_large": {
-      "input_token_price_per_1M": 0.80,
-      "output_token_price_per_1M": 0.80
-    },
-    "titan_text_express": {
-      "input_token_price_per_1M": 0.20,
-      "output_token_price_per_1M": 0.20
-    },
-    "titan_text_lite": {
-      "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.10
-    },
-    "titan_text_premier": {
-      "input_token_price_per_1M": 3.00,
-      "output_token_price_per_1M": 3.00
-    },
-    "titan_embedding_text_v2": {
-      "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.00
-    },
-    "titan_embedding_multimodal_g1": {
-      "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.00
-    },
     "nova_premier": {
-      "input_token_price_per_1M": 3.00,
-      "output_token_price_per_1M": 3.00
+      "input_token_price_per_1M": 2.50,
+      "output_token_price_per_1M": 12.50
     },
     "nova_pro": {
-      "input_token_price_per_1M": 1.00,
-      "output_token_price_per_1M": 1.00
+      "input_token_price_per_1M": 0.80,
+      "output_token_price_per_1M": 3.20
     },
     "nova_lite": {
-      "input_token_price_per_1M": 0.20,
-      "output_token_price_per_1M": 0.20
+      "input_token_price_per_1M": 0.06,
+      "output_token_price_per_1M": 0.24
     },
     "nova_micro": {
-      "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.10
+      "input_token_price_per_1M": 0.035,
+      "output_token_price_per_1M": 0.14
     }
   },
   "anthropic": {
     "claude_3_opus": {
       "input_token_price_per_1M": 15.00,
-      "output_token_price_per_1M": 75.00
+      "output_token_price_per_1M": 7.50
     },
     "claude_3.5_sonnet": {
       "input_token_price_per_1M": 3.00,
@@ -55,20 +31,20 @@
       "output_token_price_per_1M": 15.00
     },
     "claude_3.7_sonnet": {
-      "input_token_price_per_1M": 5.00,
-      "output_token_price_per_1M": 25.00
+      "input_token_price_per_1M": 3.00,
+      "output_token_price_per_1M": 15.00
     },
     "claude_3.5_haiku": {
-      "input_token_price_per_1M": 0.25,
-      "output_token_price_per_1M": 1.25
+      "input_token_price_per_1M": 0.80,
+      "output_token_price_per_1M": 4.00
     },
     "claude_opus_4": {
-      "input_token_price_per_1M": 20.00,
-      "output_token_price_per_1M": 100.00
+      "input_token_price_per_1M": 15.00,
+      "output_token_price_per_1M": 75.00
     },
     "claude_sonnet_4": {
-      "input_token_price_per_1M": 5.00,
-      "output_token_price_per_1M": 25.00
+      "input_token_price_per_1M": 3.00,
+      "output_token_price_per_1M": 15.00
     }
   },
   "cohere": {
@@ -77,12 +53,12 @@
       "output_token_price_per_1M": 2.00
     },
     "command_r": {
-      "input_token_price_per_1M": 3.00,
-      "output_token_price_per_1M": 15.00
+      "input_token_price_per_1M": 0.50,
+      "output_token_price_per_1M": 1.50
     },
     "command_r_plus": {
-      "input_token_price_per_1M": 5.00,
-      "output_token_price_per_1M": 25.00
+      "input_token_price_per_1M": 3.00,
+      "output_token_price_per_1M": 15.00
     },
     "command_light": {
       "input_token_price_per_1M": 0.30,
@@ -99,76 +75,76 @@
   },
   "meta": {
     "llama_3_8b_instruct": {
-      "input_token_price_per_1M": 0.60,
-      "output_token_price_per_1M": 1.50
+      "input_token_price_per_1M": 0.30,
+      "output_token_price_per_1M": 0.60
     },
     "llama_3_70b_instruct": {
-      "input_token_price_per_1M": 2.50,
-      "output_token_price_per_1M": 7.50
+      "input_token_price_per_1M": 2.65,
+      "output_token_price_per_1M": 3.50
     },
     "llama_3.1_8b_instruct": {
-      "input_token_price_per_1M": 0.60,
-      "output_token_price_per_1M": 1.50
+      "input_token_price_per_1M": 0.22,
+      "output_token_price_per_1M": 0.22
     },
     "llama_3.1_70b_instruct": {
-      "input_token_price_per_1M": 2.50,
-      "output_token_price_per_1M": 7.50
+      "input_token_price_per_1M": 0.72,
+      "output_token_price_per_1M": 0.72
     },
     "llama_3.2_1b_instruct": {
       "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.20
+      "output_token_price_per_1M": 0.10
     },
     "llama_3.2_3b_instruct": {
-      "input_token_price_per_1M": 0.20,
-      "output_token_price_per_1M": 0.40
+      "input_token_price_per_1M": 0.15,
+      "output_token_price_per_1M": 0.15
     },
     "llama_3.2_11b_instruct": {
-      "input_token_price_per_1M": 0.80,
-      "output_token_price_per_1M": 2.40
+      "input_token_price_per_1M": 0.16,
+      "output_token_price_per_1M": 0.16
     },
     "llama_3.2_90b_instruct": {
-      "input_token_price_per_1M": 3.00,
-      "output_token_price_per_1M": 9.00
+      "input_token_price_per_1M": 0.72,
+      "output_token_price_per_1M": 0.72
     },
     "llama_3.3_70b_instruct": {
-      "input_token_price_per_1M": 2.50,
-      "output_token_price_per_1M": 7.50
+      "input_token_price_per_1M": 0.72,
+      "output_token_price_per_1M": 0.72
     },
     "llama_4_scout_17b_instruct": {
-      "input_token_price_per_1M": 1.00,
-      "output_token_price_per_1M": 3.00
+      "input_token_price_per_1M": 0.24,
+      "output_token_price_per_1M": 0.97
     },
     "llama_4_maverick_17b_instruct": {
-      "input_token_price_per_1M": 1.00,
-      "output_token_price_per_1M": 3.00
+      "input_token_price_per_1M": 0.17,
+      "output_token_price_per_1M": 0.66
     }
   },
   "mistral": {
     "mistral_7b_instruct": {
-      "input_token_price_per_1M": 0.20,
-      "output_token_price_per_1M": 0.60
+      "input_token_price_per_1M": 0.15,
+      "output_token_price_per_1M": 0.20
     },
     "mixtral_8x7b_instruct": {
-      "input_token_price_per_1M": 0.70,
-      "output_token_price_per_1M": 2.00
+      "input_token_price_per_1M": 0.45,
+      "output_token_price_per_1M": 0.70
     },
     "mistral_large_24.02": {
-      "input_token_price_per_1M": 2.50,
-      "output_token_price_per_1M": 7.50
+      "input_token_price_per_1M": 4.00,
+      "output_token_price_per_1M": 12.00
     },
     "mistral_small_24.02": {
-      "input_token_price_per_1M": 0.20,
-      "output_token_price_per_1M": 0.60
+      "input_token_price_per_1M": 1.00,
+      "output_token_price_per_1M": 4.00
     },
     "pixtral_large_25.02": {
-      "input_token_price_per_1M": 5.00,
-      "output_token_price_per_1M": 15.00
+      "input_token_price_per_1M": 2.00,
+      "output_token_price_per_1M": 6.00
     }
   },
   "deepseek": {
     "deepseek_r1": {
-      "input_token_price_per_1M": 3.00,
-      "output_token_price_per_1M": 15.00
+      "input_token_price_per_1M": 1.35,
+      "output_token_price_per_1M": 5.40
     }
   }
 }

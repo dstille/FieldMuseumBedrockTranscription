@@ -14,6 +14,7 @@ from bedrock_interface import BedrockImageProcessor
 from bedrock_interface import create_image_processor
 from utilities.file_manager import FileManager
 from utilities import utils
+from utilities.adjust_costs import main as adjust_costs
 
 # directories
 TEMP_IMAGES_DIR = "temp_images"
@@ -555,6 +556,8 @@ def main():
     )
     st.title("Bedrock Image Transcription App")
     create_directories()
+    # Run cost adjustment script on startup
+    adjust_costs()
     st.session_state.show_save_success = False
     if st.sidebar.button("Reset App"):
         for key in list(st.session_state.keys()):
