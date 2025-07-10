@@ -20,7 +20,7 @@
   "anthropic": {
     "claude_3_opus": {
       "input_token_price_per_1M": 15.00,
-      "output_token_price_per_1M": 7.50
+      "output_token_price_per_1M": 75.00
     },
     "claude_3.5_sonnet": {
       "input_token_price_per_1M": 3.00,
@@ -111,12 +111,12 @@
       "output_token_price_per_1M": 0.72
     },
     "llama_4_scout_17b_instruct": {
-      "input_token_price_per_1M": 0.24,
-      "output_token_price_per_1M": 0.97
-    },
-    "llama_4_maverick_17b_instruct": {
       "input_token_price_per_1M": 0.17,
       "output_token_price_per_1M": 0.66
+    },
+    "llama_4_maverick_17b_instruct": {
+      "input_token_price_per_1M": 0.24,
+      "output_token_price_per_1M": 0.97
     }
   },
   "mistral": {
@@ -134,7 +134,7 @@
     },
     "mistral_small_24.02": {
       "input_token_price_per_1M": 1.00,
-      "output_token_price_per_1M": 4.00
+      "output_token_price_per_1M": 3.00
     },
     "pixtral_large_25.02": {
       "input_token_price_per_1M": 2.00,
