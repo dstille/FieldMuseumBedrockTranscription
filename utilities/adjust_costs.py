@@ -4,6 +4,7 @@
 import json
 import os
 import re
+from dotenv import load_dotenv, set_key
 
 DATA_DIR = 'data'
 PRICING_FILEPATH = 'model_info/bedrock_models_pricing.json'
@@ -43,7 +44,15 @@ def calculate_cost(input_tokens, output_tokens, pricing_info):
     return input_cost, output_cost, input_cost + output_cost
 
 def main():
+    load_dotenv()
+    
+    # Check if adjustment has already been run
+    if os.getenv('COST_ADJUST_10_JUL_25') == 'true':
+        print("Cost adjustment has already been run.")
+        return
+    
     pricing = load_json(PRICING_FILEPATH)
+    adjustment_made = False
     
     for filename in os.listdir(DATA_DIR):
         if filename.endswith('.json'):
@@ -77,8 +86,16 @@ def main():
                 
                 save_json(data, filepath)
                 print(f"Updated {filename}: ${old_total_cost:.4f} -> ${total_cost:.4f}")
+                adjustment_made = True
             else:
                 print(f"No pricing found for {model_id} in {filename}")
+    
+    if adjustment_made:
+        # Set environment variable to indicate adjustment has been run
+        set_key('.env', 'COST_ADJUST_10_JUL_25', 'true')
+        print("Cost adjustment completed and flag set.")
+    else:
+        print("No cost adjustments were needed.")
 
 if __name__ == "__main__":
     main()
