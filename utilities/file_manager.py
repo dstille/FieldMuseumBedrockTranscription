@@ -26,6 +26,15 @@ class FileManager:
         self.run_numbering = run_numbering
         #self.set_destination_files()
         return self.run_numbering
+
+    def assign_prefixes_to_urls(self, urls):
+        image_names_to_be_saved = []
+        for idx, url in enumerate(urls):
+            prefix = f"{idx+1:04d}"  # prefix will be 4 chars long
+            image_name = url.split("/")[-1]
+            image_name = f"{prefix}_{image_name}"
+            image_names_to_be_saved.append(image_name)
+        return image_names_to_be_saved        
     
     def ensure_directory_exists(self, directory):
         if not os.path.exists(directory):
@@ -36,8 +45,15 @@ class FileManager:
         end = min(start + self.chunk_size, len(self.image_names))
         return self.image_names[start:end]
 
+    def get_gaps(self, transcriptions):
+        gaps = []
+        for idx, image_name in enumerate(self.image_names):
+            if image_name not in transcriptions:
+                gaps.append(idx)
+        return gaps    
+
     def get_timestamp(self):
-        return time.strftime("%Y-%m-%d-%H%M")
+        return time.strftime("%Y-%m-%d-%H%M")    
     
     def number_images(self):
         self.run_numbering = {image_name: {"imageNumber": idx + 1, "numberAttempts": 0, "hasTranscription": False, "destination_file": None, "is_saved": False} for idx, image_name in enumerate(self.image_names)}
@@ -64,6 +80,7 @@ class FileManager:
         return filepath, self.run_numbering[image_name]["is_saved"]
     
     def save_transcriptions_csv(self, transcriptions, filepath):
+        saved_image_names = []
         try:
             fieldnames = ["imageName"]  # Start with image_name as the first field
             for image_name, data in transcriptions.items():
@@ -84,23 +101,27 @@ class FileManager:
                         data[fieldname] = val.replace('\n', ' ').replace('\r', ' ')
                     data = {"imageName": image_name} | data
                     writer.writerow(data)
+                    saved_image_names.append(image_name)
             print(f"Successfully saved CSV transcriptions to {filepath}")
-            return True
+            return True, saved_image_names
         except Exception as e:
             print(f"Error saving CSV transcriptions: {str(e)}")
-            return False
+            return False, saved_image_names
 
     def save_transcriptions_json(self, transcriptions, filepath):
+        saved_image_names = []
         try:
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(transcriptions, f, indent=2, ensure_ascii=False)
             print(f"Successfully saved JSON transcriptions to {filepath}")
-            return True
+            saved_image_names = list(transcriptions.keys())
+            return True, saved_image_names
         except Exception as e:
             print(f"Error saving JSON transcriptions: {str(e)}")
-            return False
+            return False, saved_image_names
 
     def save_transcriptions_txt(self, transcriptions, filepath):
+        saved_image_names = []
         try:
             with open(filepath, "w", encoding="utf-8") as f:
                 for i, (image_name, data) in enumerate(transcriptions.items()):
@@ -119,11 +140,12 @@ class FileManager:
                         f.write(f"{key}: {formatted_value}\n")
                     # Add footer separator
                     f.write("\n" + "=" * 50)
+                    saved_image_names.append(image_name)
             print(f"Successfully saved TXT transcriptions to {filepath}")
-            return True
+            return True, saved_image_names
         except Exception as e:
             print(f"Error saving TXT transcriptions: {str(e)}")
-            return False
+            return False, saved_image_names
         
     def set_destination_files(self):
         self.run_numbering["chunk_size"] = self.chunk_size
@@ -134,6 +156,14 @@ class FileManager:
             for image_name in chunk:
                 self.run_numbering[image_name]["chunk_number"] = idx
                 self.run_numbering[image_name]["destination_file"] = f"{self.run_name}-transcriptions#{beginning_number}-{end_number}#{self.output_format}"
+
+    def sort_images_by_prefix(self, image_names):
+        backup_numbers = iter(range(1, 10000))
+        def extract_number(image_name):
+            match = re.search(r'\d{4}', image_name)
+            return int(match.group()) if match else next(backup_numbers)
+        return sorted(image_names, key=extract_number)
+
 ###############
 
             

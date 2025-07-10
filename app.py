@@ -13,6 +13,7 @@ import shutil
 from bedrock_interface import BedrockImageProcessor
 from bedrock_interface import create_image_processor
 from utilities.file_manager import FileManager
+from input_output_manager import InputOutputManager
 from utilities import utils
 
 # directories
@@ -27,7 +28,7 @@ RECOVERY_DIR = "recovery"
 
 
 # constants
-TESTING_MODE = False
+TESTING_MODE = True
 
 def initialize_variables():
     if 'transcriptions' not in st.session_state:
@@ -52,6 +53,10 @@ def initialize_variables():
         st.session_state.model_name = ""
     if 'selected_prompt_name' not in st.session_state:
         st.session_state.selected_prompt_name = ""
+    if "selected_prompt_text" not in st.session_state:    
+        st.session_state.selected_prompt_text = ""
+    if "fieldnames" not in st.session_state:
+        st.session_state.fieldnames = []   
     if 'error_flag' not in st.session_state:
         st.session_state.error_flag = False 
     if 'proceed_option' not in st.session_state:
@@ -63,32 +68,40 @@ def initialize_variables():
     if 'time_start' not in st.session_state:
         st.session_state.time_start = get_timestamp()
     if 'pause_button_enabled' not in st.session_state:
-        st.session_state.pause_button_enabled = False 
-    if 'image_data' not in st.session_state:
-        st.session_state.image_data = {} 
+        st.session_state.pause_button_enabled = False
     if 'output_files' not in st.session_state:
         st.session_state.output_files = []
     if "chunk_size" not in st.session_state:
         st.session_state.chunk_size = 1000
     if "ignore_throttling_errors" not in st.session_state:
-        st.session_state.ignore_throttling_errors = False                           
-    
-def add_processing_data_to_image_data(source_identifier, processing_data):
-    if source_identifier in st.session_state.image_data and processing_data:
-        st.session_state.image_data[source_identifier].update(processing_data)
-    else:
-        st.session_state.image_data[source_identifier] = processing_data
+        st.session_state.ignore_throttling_errors = False
+    if "io_manager" not in st.session_state:
+        st.session_state.io_manager = None                               
 
-def copy_local_image(source_path, index):
-    try:
-        # Get the original filename
-        original_filename = os.path.basename(source_path)
-        # Create destination path
-        dest_path = os.path.join(TEMP_IMAGES_DIR, original_filename)
-        shutil.copy2(source_path, dest_path)
-        return dest_path, None
-    except Exception as e:
-        return None, f"Error copying image: {str(e)}"
+def clear_variables():
+    st.session_state.transcriptions = {}
+    st.session_state.results = []
+    st.session_state.save_completed = False
+    st.session_state.cost_data_path = ""
+    st.session_state.cost_summary = {}
+    st.session_state.volume_name = ""
+    st.session_state.output_format = ""
+    st.session_state.selected_model = ""
+    st.session_state.selected_model_obj = None    
+    st.session_state.model_name = ""
+    st.session_state.selected_prompt_name = ""
+    st.session_state.selected_prompt_text = ""
+    st.session_state.fieldnames = [] 
+    st.session_state.error_flag = False 
+    st.session_state.proceed_option = None
+    st.session_state.try_failed_jobs = False
+    st.session_state.run_numbering = {}
+    st.session_state.time_start = get_timestamp()
+    st.session_state.pause_button_enabled = False 
+    st.session_state.output_files = []
+    st.session_state.chunk_size = 1000
+    st.session_state.ignore_throttling_errors = False
+    st.session_state.io_manager = None                               
 
 def convert_data_to_transcriptions(file_path):
     file_type = st.session_state.output_format
@@ -111,31 +124,20 @@ def create_directories():
     for directory in [TEMP_IMAGES_DIR, TRANSCRIPTIONS_DIR, RAW_RESPONSES_DIR, DATA_DIR, MODEL_INFO_DIR, UPLOAD_IMAGES_DIR, RECOVERY_DIR]:
         ensure_directory_exists(directory)
 
-# Download image from URL and save to temp folder
-def download_image(url, index):
-    # Get original filename from URL
-    filename = url.split("/")[-1]
-    file_path = os.path.join(TEMP_IMAGES_DIR, filename)
-    # if image is already in temp folder, skip the download
-    if os.path.exists(file_path):
-        return file_path, None
-    try:
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            with open(file_path, "wb") as f:
-                f.write(response.content)
-            return file_path, None
-        else:
-            return None, f"Failed to download image. Status code: {response.status_code}"
-    except Exception as e:
-        return None, f"Error downloading image: {str(e)}"
-
 def ensure_data_is_json(data):
     return utils.parse_innermost_dict(data)
 
 def ensure_directory_exists(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+def get_io_error_message():
+    msg = "\n".join(st.session_state.io_manager.msg["error"])
+    st.session_state.io_manager.msg["error"] = []
+    return msg or "no error messages"
+
+def get_io_manager(run_name, model, model_name, prompt_name, prompt_text, output_format):
+    return InputOutputManager(run_name, model, model_name, prompt_name, prompt_text, output_format)       
 
 def get_legal_filename(filename):
     return re.sub(r'[\\/*?: ]', "_", filename)
@@ -145,6 +147,25 @@ def get_max_chunk_size(uploaded_file, selected_local_images):
         urls = uploaded_file.getvalue().decode("utf-8").splitlines()
         return len(urls)  
     return len(selected_local_images) or st.session_state.chunk_size
+
+def get_more_error_details(msg, e):
+    if "access denied" in str(e).lower():
+        error_msg += "\nAccess denied: You may not have permissions to use this model."
+    elif "throttling" in str(e).lower():
+        error_msg += "\nThrottling error: The service is currently rate limiting requests."
+    elif "timeout" in str(e).lower():
+        error_msg += "\nTimeout error: The request took too long to complete."
+    elif "not found" in str(e).lower() and "endpoint" in str(e).lower():
+        error_msg += "\nEndpoint not found: The inference endpoint for this model may not be set up."
+    elif "validation error" in str(e).lower():
+        error_msg += "\nValidation error: The request format may be incorrect for this model."
+    elif "format_prompt" in str(e).lower():
+        error_msg += "\nFormat error: This model may not have a proper formatter implemented."
+    elif "quota exceeded" in str(e).lower():
+        error_msg += "\nQuota exceeded: You have reached your usage limit for this model."
+    else:
+        error_msg += "\nUnknown error: An unexpected error occurred."
+    return msg       
 
 def get_proceed_options(msg):
     proceed_options = ["Pause", "Retry Failed and Remaining Jobs", "Substitute Blank Transcript and Finish Remaining Jobs", "Skip Failed Jobs and Finish Remaining Jobs", "Cancel All Jobs"]
@@ -166,7 +187,7 @@ def get_saved_runs():
     for file in os.listdir(DATA_DIR):
         if file.endswith(".json") and is_incomplete_run(file):
             saved_runs.append(file)
-    return saved_runs        
+    return saved_runs
 
 def get_timestamp():
     return time.strftime("%Y-%m-%d-%H%M")
@@ -179,66 +200,33 @@ def handle_proceed_option():
     proceed_option = st.session_state.get("proceed_option", "")
     st.session_state.results[-1]["proceed_option"] = proceed_option
     st.session_state.proceed_option = None
+    st.session_state.ignore_throttling_errors = proceed_option == "Substitute Blank Transcript for ALL THROTTLING ERRORS":
     if proceed_option == "Pause":
-        st.write("Pausing....")
-        st.session_state.ignore_throttling_errors = False  
+        st.write("Pausing....")  
         return
+    jobs = st.session_state.jobs_dict    
+    sanitize_transcriptions(jobs["failed"])    
     st.session_state.error_flag = False
-    # remove failed transcripts
-    failed_jobs = st.session_state.jobs_dict["failed"]
-    num_failed_jobs = len(failed_jobs)
-    failed_filenames = [job[1] for job in failed_jobs]
-    for orig_filename in failed_filenames:
-        if st.session_state.transcriptions and orig_filename in st.session_state.transcriptions:
-            del st.session_state.transcriptions[orig_filename]
-    if proceed_option == "Substitute Blank Transcript and Finish Remaining Jobs":
-        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
-        for orig_filename in failed_filenames:
-            st.session_state.transcriptions[orig_filename] = blank_transcript
-            st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
-        st.session_state.jobs_dict["failed"] = []
-        st.session_state.try_failed_jobs = False
-        return run_jobs()
-    st.session_state.ignore_throttling_errors = False                 
-    if proceed_option == "Skip Failed Jobs and Finish Remaining Jobs":
-        st.write("Skipping Failed Jobs and Finishing Remaining Jobs...")
-        st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
-        st.session_state.jobs_dict["failed"] = []
-        st.session_state.try_failed_jobs = False
-        return run_jobs()
-    elif proceed_option == "Substitute Blank Transcript and Finish Remaining Jobs":
-        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
-        for orig_filename in failed_filenames:
-            st.session_state.transcriptions[orig_filename] = blank_transcript
-            st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
-        st.session_state.jobs_dict["failed"] = []
-        st.session_state.try_failed_jobs = False
-        return run_jobs()      
-    elif proceed_option == "Retry Failed and Remaining Jobs":
+    if proceed_option == "Retry Failed and Remaining Jobs":
         st.write("Retrying Failed Jobs...")
         st.session_state.try_failed_jobs = True
         return run_jobs()
-    elif proceed_option == "Substitute Blank Transcript for ALL THROTTLING ERRORS":
-        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
-        for orig_filename in failed_filenames:
-            st.session_state.transcriptions[orig_filename] = blank_transcript
-            st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
-        st.session_state.jobs_dict["failed"] = []
-        st.session_state.try_failed_jobs = False
-        st.session_state.ignore_throttling_errors = True
-        return run_jobs()
-    elif proceed_option == "Cancel All Jobs":
+    jobs["num_remaining_jobs"] += len(jobs["failed"])
+    jobs["failed"] = []
+    st.session_state.try_failed_jobs = False  
+    if proceed_option == "Cancel All Jobs":
         st.write("Cancelling...")
-        st.session_state.jobs_dict["num_remaining_jobs"] -= num_failed_jobs
         st.session_state.jobs_dict["to_process"] = []
-        st.session_state.jobs_dict["failed"] = []
-        st.session_state.try_failed_jobs = False
-        return                                          
-
-def image_to_base64(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8') 
-
+        return  
+    elif proceed_option == "Skip Failed Jobs and Finish Remaining Jobs":
+        st.write("Skipping Failed Jobs and Finishing Remaining Jobs...")
+    elif proceed_option = "Substitute Blank Transcript for ALL THROTTLING ERRORS" or proceed_option = "Substitute Blank Transcript and Finish Remaining Jobs":
+        st.write("Substituting Blank Transcript...")
+        blank_transcript = utils.get_blank_transcript(st.session_state.selected_prompt_text)
+        for image_info in jobs["failed"]:
+            image_info.set_transcription(blank_transcript, st.session_state.fieldnames)
+    return run_jobs()        
+ 
 def init_jobs(num_jobs):
     st.session_state.jobs_dict = {"to_process": [], "in_process": (), "failed": [], "completed": [], "incomplete": [], "msg": {}, "num_total_jobs": num_jobs, "num_remaining_jobs": num_jobs}
 
@@ -247,33 +235,21 @@ def is_incomplete_run(file):
         data = json.load(f)
     return "incomplete_jobs" in data and data["incomplete_jobs"]
 
+def load_failed_jobs(jobs):
+    while jobs["failed"]:
+        job_to_retry = jobs["failed"].pop(-1)
+        jobs["to_process"].insert(0, job_to_retry)
+    st.session_state.try_failed_jobs = False
+    return jobs       
+
 def load_job(job: dict):
     st.session_state.jobs_dict["to_process"].append(job)
-    st.session_state.jobs_dict["incomplete"].append(job[1])
+    st.session_state.jobs_dict["incomplete"].append(job.image_name)    
 
-# images_names, chunk_size, run_name, output_format    
-
-def load_jobs_from_local_images(local_image_paths):
-    for local_path in local_image_paths:
-        filename = os.path.basename(local_path)
-        i = st.session_state.run_numbering[filename]["imageNumber"]
-        # Copy image to temp folder
-        image_path, error = copy_local_image(local_path, i)
-        if error:
-            st.session_state.results.append({"imageName": filename, "status": "error", "message": error})
-            continue
-        job = (image_path, filename, i)
-        load_job(job)    
-
-def load_jobs_from_urls(urls):
-    for url in urls:
-        i = st.session_state.run_numbering[url]["imageNumber"]
-        image_path, error = download_image(url, i)
-        if error:
-            st.session_state.results.append({"imageName": url, "status": "error", "message": error})
-            continue
-        job = (image_path, url, i)    
-        load_job(job)                          
+def load_jobs():
+    run_numbering = st.session_state.io_manager.get_run_numbering()
+    for job in run_numbering.values():
+        load_job(job)                      
 
 # Load available models from vision_model_info.json
 def load_models():
@@ -317,14 +293,15 @@ def load_saved_data(data_filename):
     st.session_state.selected_prompt_name = prompt_name
     prompt_text = load_prompts()[prompt_name]
     st.session_state.selected_prompt_text = prompt_text
+    st.session_state.fieldnames = utils.get_fieldnames_from_prompt_text(prompt_text)
     st.session_state.image_data = data["images"]
     missing_transcriptions = data["incomplete_jobs"]
     associated_transcription_filenames = data["associated_transcription_files"]
     st.session_state.volume_name = data["run_id"]
     st.session_state.output_format = associated_transcription_filenames[0].split(".")[-1].upper()
     st.session_state.chunk_size = data["run_numbering"]["chunk_size"]
-    st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
-    st.session_state.run_numbering = st.session_state.file_manager.load_run_numbering(data["run_numbering"])    
+    st.session_state.io_manager = InputOutputManager(st.session_state.volume_name, st.session_state.selected_model, st.session_state.model_name, st.session_state.selected_prompt_name, st.session_state.selected_prompt_text, st.session_state.output_format)
+    st.session_state.run_numbering = st.session_state.io_manager.load_run_numbering(data["run_numbering"])    
     return missing_transcriptions, associated_transcription_filenames
 
 def load_saved_transcriptions(associated_transcription_filenames):
@@ -336,46 +313,47 @@ def load_saved_transcriptions(associated_transcription_filenames):
 def load_saved_run(data_filename):
     missing_transcriptions, associated_transcription_filenames = load_saved_data(data_filename)
     st.session_state.transcriptions = load_saved_transcriptions(associated_transcription_filenames)
-    return missing_transcriptions    
+    return missing_transcriptions
+
+def move_to_completed_list(jobs, image_info):
+    jobs["completed"].append(image_info.image_name)
+    if image_info.image_name in jobs["incomplete"]:
+        jobs["incomplete"].remove(image_info.image_name)
+    jobs["msg"] = st.session_state.results[-1]
+    jobs["in_process"] = ()        
+    jobs["num_remaining_jobs"] -= 1      
+
+def move_to_failed_list(jobs, image_info):
+    jobs["failed"].append(image_info)
+    if image_info.image_name not in jobs["incomplete"]:
+        jobs["incomplete"].append(image_info.image_name)
+    jobs["in_process"] = ()
+    jobs["msg"] = st.session_state.results[-1]        
 
 # Define the common image processing function
-def process_single_image(img_path, source_identifier, item_index):
-    print(f"Processing {source_identifier} @ {get_timestamp()}")
-    processing_data, image_number, attempt_number, raw_response = None, None, None, None
+def process_single_image(image_info):
+    image_name, image_number, base64_image = image_info.image_name, image_info.image_number, image_info.base64_image
+    print(f"Processing {image_name} @ {get_timestamp()}")
+    processing_data, raw_response = None, None 
     try:
-        base64_image = image_to_base64(img_path)
-        processor = create_image_processor(
-            api_key="",  # Empty as we're using AWS credentials from environment
-            prompt_name=st.session_state.selected_prompt_name,
-            prompt_text=st.session_state.selected_prompt_text,
-            model=st.session_state.selected_model,
-            modelname=st.session_state.model_name,
-            output_name=st.session_state.volume_name,
-            testing=TESTING_MODE
-        )
-        # Process the image
-        run_numbering =  st.session_state.run_numbering[source_identifier]
-        image_number = run_numbering["imageNumber"]
-        attempt_number = run_numbering["numberAttempts"] + 1
-        st.session_state.run_numbering[source_identifier]["numberAttempts"] = attempt_number
-        content, processing_data, raw_response = processor.process_image(base64_image, source_identifier, item_index)
+        processor = st.session_state.io_manager.processor
+        attempt_number = image_info.increment_number_attempts
+        content, processing_data, raw_response = processor.process_image(base64_image, image_name, image_number)
         transcription_data = ensure_data_is_json(content)
         if isinstance(transcription_data, str):
-            raise Exception(f"Error processing image {source_identifier}: {transcription_data}")
+            raise Exception(f"Error processing image {image_name}: {transcription_data}")
         else:
-            # Add the transcription to the dictionary using the original filename
-            st.session_state.transcriptions[source_identifier] = transcription_data
-            run_numbering["hasTranscription"] = True
+            image_info.add_transcription(transcription_data, st.session_state.fieldnames)
             st.session_state.results.append({
-                "imageName": source_identifier,
+                "imageName": image_name,
                 "status": "success",
-                "imageRef": source_identifier,
+                "imageRef": image_name,
                 "processing_data": processing_data,
                 "image_number": image_number,
                 "attempt_number": attempt_number,
                 "raw_response": raw_response
             })
-            add_processing_data_to_image_data(source_identifier, processing_data)
+            image_info.add_processing_data_to_image_data(processing_data)
             st.session_state.progress = (st.session_state.jobs_dict["num_total_jobs"] - st.session_state.jobs_dict["num_remaining_jobs"]) / st.session_state.jobs_dict["num_total_jobs"]
             st.session_state.progress_bar.progress(st.session_state.progress)
             return True
@@ -385,111 +363,56 @@ def process_single_image(img_path, source_identifier, item_index):
         error_obj = ErrorMessage.from_exception(e)
         error_msg = error_obj.get_truncated_message(1000)
         # Add more context to the error message
-        if "access denied" in str(e).lower():
-            error_msg += "\nAccess denied: You may not have permissions to use this model."
-        elif "throttling" in str(e).lower():
-            error_msg += "\nThrottling error: The service is currently rate limiting requests."
-        elif "timeout" in str(e).lower():
-            error_msg += "\nTimeout error: The request took too long to complete."
-        elif "not found" in str(e).lower() and "endpoint" in str(e).lower():
-            error_msg += "\nEndpoint not found: The inference endpoint for this model may not be set up."
-        elif "validation error" in str(e).lower():
-            error_msg += "\nValidation error: The request format may be incorrect for this model."
-        elif "format_prompt" in str(e).lower():
-            error_msg += "\nFormat error: This model may not have a proper formatter implemented."
-        elif "quota exceeded" in str(e).lower():
-            error_msg += "\nQuota exceeded: You have reached your usage limit for this model."
-        else:
-            error_msg += "\nUnknown error: An unexpected error occurred."
+        error_msg += get_more_error_details(msg, e)
         if processing_data:
             if "input cost $" in processing_data and processing_data["input cost $"] > 0.0:
                 error_msg = f"WARNING!!! CHARGES WERE ACCRUED DURING THIS FAILED JOB:\n{processing_data = }" + msg 
         st.session_state.results.append({
-            "imageName": source_identifier,
+            "imageName": image_name,
             "status": "error",
             "message": f"Error processing image: {error_msg}",
-            "imageRef": source_identifier,
+            "imageRef": image_name,
             "processing_data": processing_data,
             "image_number": image_number,
             "attempt_number": attempt_number,
             "raw_response": raw_response
         })
-        add_processing_data_to_image_data(source_identifier, processing_data)
+        image_info.add_processing_data_to_image_data(processing_data)
         return False
-
-def resume_jobs(try_failed_jobs=False):
-    if try_failed_jobs:
-        jobs = st.session_state.jobs_dict
-        while jobs["failed"]:
-            job_to_retry = jobs["failed"].pop(-1)
-            jobs["to_process"].insert(0, job_to_retry)
-    return run_jobs()
 
 def run_jobs():
     print(f"in run_jobs @ {get_timestamp()}")
     jobs = st.session_state.jobs_dict
     if jobs["failed"] and st.session_state.try_failed_jobs:
-        while jobs["failed"]:
-            job_to_retry = jobs["failed"].pop(-1)
-            jobs["to_process"].insert(0, job_to_retry)
-        st.session_state.try_failed_jobs = False    
+        jobs = load_failed_jobs(jobs) 
     while jobs["to_process"]:
         jobs["in_process"] = jobs["to_process"].pop(0)
-        img_path, orig_filename, item_index = jobs["in_process"]
-        is_successful_job = process_single_image(img_path, orig_filename, item_index)
-        print(f"run_jobs: {is_successful_job = }, {jobs['in_process'] = }")
+        image_info = jobs["in_process"]
+        is_successful_job = process_single_image(image_info)
+        save_transcription(image_info.image_number)
+        print(f"run_jobs: {is_successful_job = }, {image_info}")
         if not is_successful_job:
-            jobs["failed"].append(jobs["in_process"])
-            if orig_filename not in jobs["incomplete"]:
-                jobs["incomplete"].append(orig_filename)
-            jobs["in_process"] = ()
-            jobs["msg"] = st.session_state.results[-1]
+            move_to_failed_list(jobs, image_info)
             st.session_state.error_flag = True
-            save_transcription(orig_filename)
-            return False
-        jobs["completed"].append(orig_filename)
-        if orig_filename in jobs["incomplete"]:
-            jobs["incomplete"].remove(orig_filename)
-        jobs["msg"] = st.session_state.results[-1]
-        jobs["in_process"] = ()        
-        jobs["num_remaining_jobs"] -= 1
-        save_transcription(orig_filename)    
-    st.session_state.error_flag = False          
-    return True
+            return is_successful_job
+        else:    
+            move_to_completed_list(jobs, image_info)    
+            st.session_state.error_flag = False          
+    return is_successful_job
+
+def sanitize_transcriptions(images_to_remove):
+    for image_info in images_to_remove:
+        image_info.delete_transcription()    
 
 def save_cost_data():
     volume_name = st.session_state.volume_name
     model_id = st.session_state.selected_model 
-    model_name = st.session_state.model_name 
-    results = st.session_state.results 
+    model_name = st.session_state.model_name  
     prompt_name = st.session_state.selected_prompt_name
-    image_data = st.session_state.image_data
     associated_transcription_filenames = st.session_state.output_files
-    os.makedirs(DATA_DIR, exist_ok=True)
     filename = f"{DATA_DIR}/{volume_name}-data.json"
-    # Calculate total tokens and costs
-    total_input_tokens = 0
-    total_output_tokens = 0
-    total_input_cost = 0.0
-    total_output_cost = 0.0
-    total_time = 0.0
-    image_costs = {}
-
-    incomplete_jobs, completed_jobs = [], []
-    for image_name in st.session_state.file_manager.image_names:
-        if st.session_state.run_numbering[image_name]["hasTranscription"]:
-            completed_jobs.append(image_name)
-        else:
-            incomplete_jobs.append(image_name)
-    
-    # Extract processing data from successful results
-    for data in image_data.values():
-        total_input_tokens += data.get("input tokens", 0)
-        total_output_tokens += data.get("output tokens", 0)
-        total_input_cost += data.get("input cost $", 0.0)
-        total_output_cost += data.get("output cost $", 0.0)
-        total_time += data.get("time to create/edit (mins)", 0.0)
-    
+    run_numbering = st.session_state.io_manager.get_run_numbering()
+    overall_costs, image_data, incomplete_jobs, completed_jobs = tally_data(run_numbering)
     # Create the cost data structure
     cost_data = {
         "run_id": volume_name,
@@ -501,22 +424,21 @@ def save_cost_data():
             "name": model_name
         },
         "prompt": prompt_name,
-        "images_processed": len([r for r in st.session_state.results if r["status"] == "success"]),
-        "images_failed": len([r for r in st.session_state.results if r["status"] == "error"]),
+        "images_processed": len(completed_jobs),
+        "images_failed": len(incomplete_jobs),
         "tokens": {
-            "input": total_input_tokens,
-            "output": total_output_tokens,
-            "total": total_input_tokens + total_output_tokens
+            "input": overall_costs["input_tokens"],
+            "output": overall_costs["output_tokens"],
         },
         "costs": {
-            "input": total_input_cost,
-            "output": total_output_cost,
-            "total": total_input_cost + total_output_cost
+            "input": overall_costs["input cost $"],
+            "output": overall_costs["output cost $"],
+            "total": overall_costs["input cost $"] + overall_costs["output cost $"]
         },
-        "processing_time_minutes": total_time
+        "processing_time_minutes": overall_costs["time to create/edit (mins)"]
     }
     cost_data["images"] = image_data
-    cost_data["run_numbering"] = st.session_state.run_numbering
+    cost_data["run_numbering"] = run_numbering
     cost_data["completed_jobs"] = completed_jobs
     cost_data["incomplete_jobs"] = incomplete_jobs
     # Save the cost data to the JSON file
@@ -529,15 +451,18 @@ def save_cost_data():
         st.error(f"Error saving cost data: {str(e)}")
     return filename, cost_data
 
-def save_transcription(image_name):
+def save_transcription(image_number):
     try:
-        filepath, is_saved = st.session_state.file_manager.save_transcription(image_name, st.session_state.transcriptions)
+        filepath, is_saved = st.session_state.file_manager.save_transcription(image_number)
         st.session_state.save_completed = is_saved
         st.session_state.show_save_success = is_saved
         if is_saved:
             save_cost_data()
             if filepath not in st.session_state.output_files:
                 st.session_state.output_files.append(filepath)
+        else:
+            msg = get_io_error_message()
+            st.error(msg)        
     except Exception as e:
         print(f"Error in save_transcriptions_callback: {str(e)}")
         st.error(f"Error saving files: {str(e)}")
@@ -545,8 +470,23 @@ def save_transcription(image_name):
 
 def set_start_time():
     if "start_time" not in st.session_state:
-        st.session_state.start_time_str = get_timestamp()    
+        st.session_state.start_time_str = get_timestamp()
 
+def tally_data(run_numbering):
+    overall_costs = {"input tokens": 0, "output tokens": 0, "input cost $": 0.0, "output cost $": 0.0, "time to create/edit (mins)": 0.0}
+    image_costs = {}
+    incomplete_jobs, completed_jobs = [], []
+    for image_number, image_info in run_numbering.items():
+        if image_info.has_completed_transcription:
+            completed_jobs.append(image_info.image_name)
+        else:
+            incomplete_jobs.append(image_info.image_name)
+        costs = image_info.data
+        if costs:
+            image_costs[image_info.image_name] = costs   
+            overall_costs.update(costs)
+    return overall_costs, image_costs, incomplete_jobs, completed_jobs            
+                    
 def main():
     st.set_page_config(
     page_title="Bedrock Image Transcription App",
@@ -700,17 +640,17 @@ def main():
                 )
             # End Selection of Output File Format
             # 6. Process button - disable if no input is provided
-            process_button_disabled = (input_method == "Upload URLs File" and not uploaded_file) or \
-                                    (input_method == "Select Local Images" and not selected_local_images)
-            #process_button_disabled = False
+            process_button_disabled = True
+            if input_method == "Upload URLs File" and uploaded_file or input_method == "Select Local Images" and selected_local_images:
+                st.session_state.io_manager = InputOutputManager(run_name=st.session_state.volume_name, model=selected_model, model_name=model_name, prompt_name=selected_prompt_name, prompt_text=selected_prompt_text, output_format=output_format)
+                st.session_state.fieldnames = utils.get_fieldnames_from_prompt_text(selected_prompt_text)
+                process_button_disabled = False
             process_button_clicked = st.button("Process Images", type="primary", disabled=process_button_disabled)
             # End 6.
             # persistance
             st.session_state.selected_model = selected_model
             st.session_state.model_name = model_name
             st.session_state.selected_model_obj = selected_model_obj
-            st.session_state.selected_prompt_name = selected_prompt_name
-            st.session_state.selected_prompt_text = selected_prompt_text
         ##### End New Run Sidebar
         else:
             # Complete Saved Run Sidebar
@@ -744,27 +684,37 @@ def main():
             if input_method == "Upload URLs File" and uploaded_file is not None:
                 urls = uploaded_file.getvalue().decode("utf-8").splitlines()
                 urls = [url.strip() for url in urls if url.strip()]
-                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
-                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(urls, st.session_state.chunk_size)
                 if not urls:
                     st.error("No URLs found in the uploaded file.")
                     return
-                has_valid_input = True
-                st.info(f"Processing {len(urls)} images from URLs...")
+                st.info(f"Processing {len(urls)} images from URLs...")    
+                st.session_state.run_numbering = st.session_state.io_manager.set_run_numbering(images_to_process=urls, use_urls=True, chunk_size=st.session_state.chunk_size)
+                
+
+                
             # create list of local image paths
             elif input_method == "Select Local Images" and selected_local_images:
-                st.session_state.file_manager = FileManager(st.session_state.volume_name, st.session_state.output_format)
-                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(selected_local_images, st.session_state.chunk_size)
-                local_image_paths = [os.path.join(UPLOAD_IMAGES_DIR, img) for img in selected_local_images]
+                st.session_state.run_numbering = st.session_state.file_manager.set_run_numbering(images_to_process=selected_local_images, use_urls=False, chunk_size=st.session_state.chunk_size)
+                st.info(f"Processing {len(selected_local_images)} local images...")
+            st.session_state.total_items = len(st.session_state.run_numbering)    
+            io_error_msg = get_io_error_message()
+            if io_error_msg == "no error messages":
                 has_valid_input = True
-                st.info(f"Processing {len(local_image_paths)} local images...")
+            else:
+                st.error(io_error_msg)
+                st.info(f"{st.session_state.total_items} available to process")
+                go_ahead_and_process_option = st.radio("Proceed?" ["Yes", "No (Cancel)"])
+                if go_ahead_and_process_option == "No (Cancel)":
+                    has_valid_input = False
+                if go_ahead_and_process_option == "Yes":
+                    has_valid_input = True
+                    st.info(f"Processing {number_images} images...")    
             if not has_valid_input:
                 st.error("Please provide input images (either upload a URL file or select local images).")
                 return
         # Start Setting Up Jobs
-        st.session_state.total_items = len(urls) + len(local_image_paths)
         init_jobs(st.session_state.total_items)
-        load_jobs_from_urls(urls) if urls else load_jobs_from_local_images(local_image_paths)
+        load_jobs_from_urls(urls) if urls else load_jobs_from_local_images(selected_local_images)
         # End Loading Local Images
         # Begin Processing Jobs
         st.session_state.progress = (st.session_state.jobs_dict["num_total_jobs"] - st.session_state.jobs_dict["num_remaining_jobs"]) / st.session_state.jobs_dict["num_total_jobs"]
@@ -792,9 +742,12 @@ def main():
         st.subheader("Cost Summary")
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Total Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")
+            st.metric("Total Input Cost", f"${st.session_state.cost_summary['costs']['input']:.4f}")
+            st.metric("Total Output Cost", f"${st.session_state.cost_summary['costs']['output']:.4f}")
+            st.metric("Total Overall Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")
         with col2:
-            st.metric("Total Tokens", f"{st.session_state.cost_summary['tokens']['total']:,}")
+            st.metric("Total Input Tokens", f"{st.session_state.cost_summary['tokens']['input']:,}")
+            st.metric("Total Output Tokens", f"{st.session_state.cost_summary['tokens']['output']:,}")
         with col3:
             st.metric("Processing Time", f"{st.session_state.cost_summary['processing_time_minutes']:.2f} min")
         # After displaying the results, check if files were saved
