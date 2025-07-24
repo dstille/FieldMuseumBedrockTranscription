@@ -7,6 +7,7 @@ from typing import Dict, Any, Tuple, Optional
 from botocore.exceptions import ClientError
 from llm_interface import ImageProcessor
 from utilities.base64_filter import filter_base64, filter_base64_from_dict
+from dotenv import load_dotenv
 
 class BedrockImageProcessor(ImageProcessor):
     def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name):
@@ -192,19 +193,20 @@ class BedrockImageProcessor(ImageProcessor):
 ####### Testing Module  #######
 import random
 RANDOM_ERROR_THRESHOLD = 0.25
-SAMPLE_DIRECTORY  = "raw_llm_responses"
-SAMPLE_FILE = "nova/httpsfm-digital-assetsfieldmuseumorg2298823C0399179Fjpg-2025-05-31-1632-09-raw.json"
+SAMPLE_DIRECTORY  = "testing/raw_llm_responses_for_testing"
+SAMPLE_FILE = "httpsfm-digital-assetsfieldmuseumorg2298823C0399179Fjpg-2025-05-31-1632-09-raw.json"
 
 class BedrockImageProcessorTesting(ImageProcessor):
-    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name, include_random_error=True):
+    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name):
         super().__init__(api_key, prompt_name, prompt_text, model, modelname, output_name)
+        load_dotenv()
         self.bedrock_client = boto3.client("bedrock-runtime")
         self.bedrock_mgmt = boto3.client("bedrock")
         self.model_info = None
         self.account_id = self._get_account_id()
         self.pricing_data = self.load_pricing_data()
         self.set_token_costs_per_mil()
-        self.include_random_error = include_random_error
+        self.include_random_error = os.getenv("INCLUDE_RANDOM_ERROR", "False").lower() == "true"
     
     def _get_account_id(self) -> str:
         """Get the AWS account ID."""

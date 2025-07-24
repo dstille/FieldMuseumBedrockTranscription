@@ -1,0 +1,20 @@
+{
+    "output": {
+        "message": {
+            "content": [
+                {
+                    "text": "{\"transcription\": {\"verbatimCollectors\": \"Frahm 22.7.1977\", \"collectedBy\": \"Frahm\", \"secondaryCollectors\": \"\", \"recordNumber\": \"C0299179F\", \"verbatimEventDate\": \"22.7.1977\", \"minimumEventDate\": \"1977-07-22\", \"maximumEventDate\": \"N/A\", \"verbatimIdentification\": \"26. Campylopus arcocarpus (Hornsch.) Mitt.\", \"latestScientificName\": \"Campylopus arcocarpus\", \"identifiedBy\": \"Frahm\", \"verbatimDateIdentified\": \"22.7.1977\", \"associatedTaxa\": \"\", \"country\": \"Brazil\", \"firstPoliticalUnit\": \"S\\u00e3o Paulo\", \"secondPoliticalUnit\": \"\", \"municipality\": \"S\\u00e3o Jos\\u00e9 dos Barreiros\", \"verbatimLocality\": \"Sao Paulo, Serra do Bocaina, Leeseite, an der Strasse: Campos da Cunha \\u2013 Sao Jos\\u00e9 dos Barreiros\", \"locality\": \"On the leeward side of the Serra do Boca\\u00edna mountain range in S\\u00e3o Jos\\u00e9 dos Barreiros, S\\u00e3o Paulo\", \"habitat\": \"epiphytic in Podocarpus-Wald 1200 m\\u00a0m\\u00a0sm\", \"verbatimElevation\": \"1200 m\", \"verbatimCoordinates\": \"\", \"otherCatalogNumbers\": \"1026026\", \"originalMethod\": \"Typed\", \"typeStatus\": \"no type status\"}}"
+                }
+            ],
+            "role": "assistant"
+        }
+    },
+    "stopReason": "end_turn",
+    "usage": {
+        "inputTokens": 3383,
+        "outputTokens": 393,
+        "totalTokens": 3776,
+        "cacheReadInputTokenCount": 0,
+        "cacheWriteInputTokenCount": 0
+    }
+}

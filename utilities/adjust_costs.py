@@ -45,6 +45,11 @@ def calculate_cost(input_tokens, output_tokens, pricing_info):
 
 def main():
     load_dotenv()
+    additional_flags_to_set = ['INCLUDE_STACK_TRACE', 'TESTING_MODE']
+    # set each flag to false if they are not already in the .env
+    for flag in additional_flags_to_set:
+        if os.getenv(flag) is None:
+            set_key('.env', flag, 'false')
     
     # Check if adjustment has already been run
     if os.getenv('COST_ADJUST_10_JUL_25') == 'true':

@@ -17,7 +17,6 @@ def parse_innermost_dict(d):
         d = "{" + inner_dict + "}"
         #### remove excess escape characters
         d = remove_extra_escape_chars(d)
-        #print(f"{d = }")
         d = json.loads(d)
     if type(d) == dict and "text" in d:
         d = d["text"]

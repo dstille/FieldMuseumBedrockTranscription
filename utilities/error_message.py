@@ -6,12 +6,15 @@ This module provides a class for handling and displaying error messages.
 
 import traceback
 import sys
+import os
 from typing import Optional
+from dotenv import load_dotenv
 
 class ErrorMessage:
     """A class for handling and displaying error messages with length limits."""
     
     def __init__(self, value: str, max_length: int = 2000):
+        print("ErrorMessage object created!!!!!")
         """
         Initialize an ErrorMessage.
         
@@ -19,10 +22,11 @@ class ErrorMessage:
             value: The error message text
             max_length: Maximum length to display in string representation
         """
-        self.value = value
+        load_dotenv()
+        self.include_stack_trace = os.getenv("INCLUDE_STACK_TRACE", "false").lower() == "true"
+        self.stack_trace = traceback.format_exc() if self.include_stack_trace else ""
+        self.value = str(value)
         self.max_length = max_length
-        
-        # Print traceback to terminal when created
         print("\nError traceback:", file=sys.stderr)
         traceback.print_stack(file=sys.stderr)
     
@@ -33,10 +37,10 @@ class ErrorMessage:
         Returns:
             The error message, truncated if longer than max_length
         """
-        if len(self.value) <= self.max_length:
-            return self.value
+        if True:#len(self.value) <= self.max_length:
+            return self.value + self.stack_trace
         else:
-            return f"{self.value[:self.max_length]}... [Error message truncated, total length: {len(self.value)}]"
+            return f"{self.value[:self.max_length]}... [Error message truncated, total length: {len(self.value)}]" + self.stack_trace
     
     def __repr__(self) -> str:
         """
@@ -54,7 +58,7 @@ class ErrorMessage:
         Returns:
             The complete error message
         """
-        return self.value
+        return self.value + self.stack_trace
     
     def get_truncated_message(self, length: Optional[int] = None) -> str:
         """
@@ -68,9 +72,9 @@ class ErrorMessage:
         """
         max_len = length if length is not None else self.max_length
         if len(self.value) <= max_len:
-            return self.value
+            return self.value + self.stack_trace
         else:
-            return f"{self.value[:max_len]}... [truncated]"
+            return f"{self.value[:max_len]}... [truncated]" + self.stack_trace
     
     @classmethod
     def from_exception(cls, exception: Exception, max_length: int = 2000) -> 'ErrorMessage':
