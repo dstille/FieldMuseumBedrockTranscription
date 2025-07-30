@@ -99,7 +99,6 @@ class BedrockImageProcessor(ImageProcessor):
         if not self.model_info:
             return False
         inference_types = self.model_info.get("inferenceTypes", [])
-        print(f"Inference types: {inference_types}")
         return "INFERENCE_PROFILE" in inference_types
     
     def get_model_id(self) -> str:
@@ -121,8 +120,6 @@ class BedrockImageProcessor(ImageProcessor):
         request_body = self.format_prompt(base64_image)
         provider = self.model.split(".")[0] if "." in self.model else ""
         # TODO: Process differently based on provider, especially meta
-        if self.needs_inference_profile():
-                print(f"Using inference profile for model {self.model}")
         try:
             text, processing_data, raw_response = self._process_with_bedrock(request_body, base64_image, image_name, start_time)
             return text, processing_data, raw_response
@@ -134,7 +131,6 @@ class BedrockImageProcessor(ImageProcessor):
     def _process_with_bedrock(self, request_body: Dict[str, Any], base64_image: str, 
                              image_name: str, start_time: float) -> Tuple[str, Dict[str, Any]]:
         model_id = self.get_model_id()
-        print(f"Invoking model with ID: {model_id}")
         raw_response = None
         try:
             response = self.bedrock_client.invoke_model(

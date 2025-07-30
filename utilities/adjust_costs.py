@@ -14,29 +14,14 @@ def save_json(data, filepath):
         json.dump(data, f, indent=4)
 
 def load_json(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def get_model_and_family_name(model_id):
     family_name, model_name_long = model_id.split('.')
-    
-    if 'sonnet' in model_name_long:
-        if '3-5-sonnet' in model_name_long:
-            if 'v2' in model_name_long:
-                return family_name, 'claude_3.5_sonnet_v2'
-            else:
-                return family_name, 'claude_3.5_sonnet'
-        elif '3-7-sonnet' in model_name_long:
-            return family_name, 'claude_3.7_sonnet'
-    elif 'nova' in model_name_long:
-        if 'premier' in model_name_long:
-            return family_name, 'nova_premier'
-        elif 'pro' in model_name_long:
-            return family_name, 'nova_pro'
-        elif 'lite' in model_name_long:
-            return family_name, 'nova_lite'
-    
-    return family_name, model_name_long
+    # Remove version suffix (e.g., ':0') from model name
+    model_name_clean = model_name_long.split(':')[0]
+    return family_name, model_name_clean
 
 def calculate_cost(input_tokens, output_tokens, pricing_info):
     input_cost = (input_tokens / 1_000_000) * pricing_info['input_token_price_per_1M']
@@ -45,14 +30,14 @@ def calculate_cost(input_tokens, output_tokens, pricing_info):
 
 def main():
     load_dotenv()
-    additional_flags_to_set = ['INCLUDE_STACK_TRACE', 'TESTING_MODE']
+    additional_flags_to_set = ['INCLUDE_STACK_TRACE', 'TESTING_MODE', 'INCLUDE_RANDOM_ERROR']
     # set each flag to false if they are not already in the .env
     for flag in additional_flags_to_set:
         if os.getenv(flag) is None:
-            set_key('.env', flag, 'false')
+            set_key('.env', flag, 'False')
     
     # Check if adjustment has already been run
-    if os.getenv('COST_ADJUST_10_JUL_25') == 'true':
+    if os.getenv('COST_ADJUST_23_JUL_25', 'False').lower() == 'true':
         print("Cost adjustment has already been run.")
         return
     
@@ -64,7 +49,7 @@ def main():
             filepath = os.path.join(DATA_DIR, filename)
             data = load_json(filepath)
             
-            model_id = data['model']['id']
+            model_id = data['model']
             family_name, model_name = get_model_and_family_name(model_id)
             
             if family_name in pricing and model_name in pricing[family_name]:
@@ -97,7 +82,7 @@ def main():
     
     if adjustment_made:
         # Set environment variable to indicate adjustment has been run
-        set_key('.env', 'COST_ADJUST_10_JUL_25', 'true')
+        set_key('.env', 'COST_ADJUST_23_JUL_25', 'True')
         print("Cost adjustment completed and flag set.")
     else:
         print("No cost adjustments were needed.")

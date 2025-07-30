@@ -97,33 +97,19 @@ class ImageProcessor:
     def set_token_costs_per_mil(self):
         """Set token costs based on the model provider and model name from pricing data."""
         provider = self.model.split(".")[0] if "." in self.model else ""
-        model_short_name = self.model.split(".")[-1] if "." in self.model else self.model
+        model_short_name = self.model.split(".")[-1].split(":")[0] if "." in self.model else self.model
         
         # Default costs
-        self.input_cost_per_mil = 1.0
-        self.output_cost_per_mil = 2.0
+        self.input_cost_per_mil = 0.0
+        self.output_cost_per_mil = 0.0
         
         # Try to get pricing from the pricing data file
         if hasattr(self, 'pricing_data') and self.pricing_data and provider in self.pricing_data:
-            # Try to find an exact match for the model
-            for model_key, price_info in self.pricing_data[provider].items():
-                # Check if model_key is part of the model name or vice versa
-                if model_key in model_short_name or model_short_name in model_key:
-                    self.input_cost_per_mil = price_info.get("input_token_price_per_1M", self.input_cost_per_mil)
-                    self.output_cost_per_mil = price_info.get("output_token_price_per_1M", self.output_cost_per_mil)
-                    print(f"Found pricing for {model_key}: Input=${self.input_cost_per_mil}/1M, Output=${self.output_cost_per_mil}/1M")
-                    return
+            if model_short_name in self.pricing_data[provider]:
+                price_info = self.pricing_data[provider][model_short_name]
+                self.input_cost_per_mil = price_info.get("input_token_price_per_1M", self.input_cost_per_mil)
+                self.output_cost_per_mil = price_info.get("output_token_price_per_1M", self.output_cost_per_mil)
+                print(f"Found pricing for {model_short_name}: Input=${self.input_cost_per_mil}/1M, Output=${self.output_cost_per_mil}/1M")
+            else:
+                print(f"No pricing found for {provider}.{model_short_name}, using null values!!!!")
         
-        # Fallback to provider-specific costs if no match found
-        if provider == "anthropic":
-            self.input_cost_per_mil = 8.0
-            self.output_cost_per_mil = 24.0
-        elif provider == "amazon":
-            self.input_cost_per_mil = 0.8
-            self.output_cost_per_mil = 1.6
-        elif provider == "mistral":
-            self.input_cost_per_mil = 7.0
-            self.output_cost_per_mil = 20.0
-        elif provider == "meta":
-            self.input_cost_per_mil = 6.0
-            self.output_cost_per_mil = 6.0    

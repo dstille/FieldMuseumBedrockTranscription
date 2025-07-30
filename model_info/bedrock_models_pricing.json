@@ -1,48 +1,44 @@
 {
   "amazon": {
-    "nova_premier": {
+    "nova-premier-v1": {
       "input_token_price_per_1M": 2.50,
       "output_token_price_per_1M": 12.50
     },
-    "nova_pro": {
+    "nova-pro-v1": {
       "input_token_price_per_1M": 0.80,
       "output_token_price_per_1M": 3.20
     },
-    "nova_lite": {
+    "nova-lite-v1": {
       "input_token_price_per_1M": 0.06,
       "output_token_price_per_1M": 0.24
     },
-    "nova_micro": {
+    "nova-micro-v1": {
       "input_token_price_per_1M": 0.035,
       "output_token_price_per_1M": 0.14
     }
   },
   "anthropic": {
-    "claude_3_opus": {
+    "claude-3-opus-20240229-v1": {
       "input_token_price_per_1M": 15.00,
       "output_token_price_per_1M": 75.00
     },
-    "claude_3.5_sonnet": {
+    "claude-3-5-sonnet-20240620-v1": {
       "input_token_price_per_1M": 3.00,
       "output_token_price_per_1M": 15.00
     },
-    "claude_3.5_sonnet_v2": {
+    "claude-3-5-sonnet-20241022-v2": {
       "input_token_price_per_1M": 3.00,
       "output_token_price_per_1M": 15.00
     },
-    "claude_3.7_sonnet": {
+    "claude-3-7-sonnet-20250219-v1": {
       "input_token_price_per_1M": 3.00,
       "output_token_price_per_1M": 15.00
     },
-    "claude_3.5_haiku": {
+    "claude-3-haiku-20240307-v1": {
       "input_token_price_per_1M": 0.80,
       "output_token_price_per_1M": 4.00
     },
-    "claude_opus_4": {
-      "input_token_price_per_1M": 15.00,
-      "output_token_price_per_1M": 75.00
-    },
-    "claude_sonnet_4": {
+    "claude-3-sonnet-20240229-v1": {
       "input_token_price_per_1M": 3.00,
       "output_token_price_per_1M": 15.00
     }
@@ -74,75 +70,31 @@
     }
   },
   "meta": {
-    "llama_3_8b_instruct": {
-      "input_token_price_per_1M": 0.30,
-      "output_token_price_per_1M": 0.60
-    },
-    "llama_3_70b_instruct": {
-      "input_token_price_per_1M": 2.65,
-      "output_token_price_per_1M": 3.50
-    },
-    "llama_3.1_8b_instruct": {
-      "input_token_price_per_1M": 0.22,
-      "output_token_price_per_1M": 0.22
-    },
-    "llama_3.1_70b_instruct": {
-      "input_token_price_per_1M": 0.72,
-      "output_token_price_per_1M": 0.72
-    },
-    "llama_3.2_1b_instruct": {
-      "input_token_price_per_1M": 0.10,
-      "output_token_price_per_1M": 0.10
-    },
-    "llama_3.2_3b_instruct": {
-      "input_token_price_per_1M": 0.15,
-      "output_token_price_per_1M": 0.15
-    },
-    "llama_3.2_11b_instruct": {
+    "llama3-2-11b-instruct-v1": {
       "input_token_price_per_1M": 0.16,
       "output_token_price_per_1M": 0.16
     },
-    "llama_3.2_90b_instruct": {
+    "llama3-2-90b-instruct-v1": {
       "input_token_price_per_1M": 0.72,
       "output_token_price_per_1M": 0.72
     },
-    "llama_3.3_70b_instruct": {
-      "input_token_price_per_1M": 0.72,
-      "output_token_price_per_1M": 0.72
-    },
-    "llama_4_scout_17b_instruct": {
+    "llama4-scout-17b-instruct-v1": {
       "input_token_price_per_1M": 0.17,
       "output_token_price_per_1M": 0.66
     },
-    "llama_4_maverick_17b_instruct": {
+    "llama4-maverick-17b-instruct-v1": {
       "input_token_price_per_1M": 0.24,
       "output_token_price_per_1M": 0.97
     }
   },
   "mistral": {
-    "mistral_7b_instruct": {
-      "input_token_price_per_1M": 0.15,
-      "output_token_price_per_1M": 0.20
-    },
-    "mixtral_8x7b_instruct": {
-      "input_token_price_per_1M": 0.45,
-      "output_token_price_per_1M": 0.70
-    },
-    "mistral_large_24.02": {
-      "input_token_price_per_1M": 4.00,
-      "output_token_price_per_1M": 12.00
-    },
-    "mistral_small_24.02": {
-      "input_token_price_per_1M": 1.00,
-      "output_token_price_per_1M": 3.00
-    },
-    "pixtral_large_25.02": {
+    "pixtral-large-2502-v1": {
       "input_token_price_per_1M": 2.00,
       "output_token_price_per_1M": 6.00
     }
   },
   "deepseek": {
-    "deepseek_r1": {
+    "deepseek-r1": {
       "input_token_price_per_1M": 1.35,
       "output_token_price_per_1M": 5.40
     }

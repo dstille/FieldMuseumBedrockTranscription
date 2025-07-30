@@ -12,7 +12,7 @@ import bedrock_interface
 from utilities.error_message import ErrorMessage
 from utilities.utils import get_fieldnames_from_prompt_text
 
-load_dotenv(override=True)
+load_dotenv()
 
 TESTING_MODE = os.getenv("TESTING_MODE", "False").lower() == "true"
 
