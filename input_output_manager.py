@@ -12,13 +12,13 @@ import bedrock_interface
 from utilities.error_message import ErrorMessage
 from utilities.utils import get_fieldnames_from_prompt_text
 
-load_dotenv()
+load_dotenv(override=True)
 
 TESTING_MODE = os.getenv("TESTING_MODE", "False").lower() == "true"
 
 class InputOutputManager:
     def __init__(self, run_name, model, model_name, prompt_name, prompt_text, output_format):
-        self.processing_begun = False
+        self.inputs_committed = False
         self.run_name = run_name
         self.run_numbering = {}
         self.model = model
@@ -134,6 +134,7 @@ class InputOutputManager:
         run_numbering = self.set_run_numbering(images_to_process, use_urls, chunk_size, set_destination=False)
         for image_number, image_info in saved_job_numbering.items():
             run_numbering[int(image_number)].load_image_info(image_info)
+        self.inputs_committed = True    
         return self.get_run_numbering() 
               
     def number_run(self, set_destination):
@@ -147,7 +148,7 @@ class InputOutputManager:
         self.use_urls = use_urls
         self.chunk_size = chunk_size
         self.number_run(set_destination)
-        self.processing_begun = True
+        self.inputs_committed = True
         return self.get_run_numbering()
 
     def save_transcription(self, image_number):

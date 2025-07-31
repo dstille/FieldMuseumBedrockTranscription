@@ -27,7 +27,7 @@ class ModelManager:
         self.pricing = self.load_model_pricing()
         
         # Default pricing for unknown providers
-        self.default_pricing = {"input": 1.0, "output": 2.0}
+        self.default_pricing = {"input": 0.0, "output": 0.0}
     
     def _get_account_id(self) -> str:
         """Get the AWS account ID."""

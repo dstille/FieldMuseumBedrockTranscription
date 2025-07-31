@@ -18,10 +18,6 @@ from utilities import utils
 from utilities.adjust_costs import main as adjust_costs
 from utilities.error_message import ErrorMessage
 
-load_dotenv()
-TESTING_MODE = os.getenv("TESTING_MODE", "False").lower() == "true"
-RUN_PREFIX = "test-" if TESTING_MODE else ""
-
 # directories
 TEMP_IMAGES_DIR = "temp_images"
 TRANSCRIPTIONS_DIR = "transcriptions"
@@ -33,6 +29,11 @@ UPLOAD_IMAGES_DIR = "images_to_upload"
 RECOVERY_DIR = "recovery"
 
 def initialize_variables():
+    load_dotenv(override=True)
+    if "testing_mode" not in st.session_state:
+        st.session_state.testing_mode = os.getenv("TESTING_MODE", "False").lower() == "true"
+    if "run_prefix" not in st.session_state:
+        st.session_state.run_prefix = "test-" if st.session_state.testing_mode else ""   
     if 'results' not in st.session_state:
         st.session_state.results = []
     if 'save_completed' not in st.session_state:
@@ -82,9 +83,14 @@ def initialize_variables():
     if "task_option" not in st.session_state:
         st.session_state.task_option = ""
     if "process_button_clicked" not in st.session_state:
-        st.session_state.process_button_clicked = False                                                         
+        st.session_state.process_button_clicked = False
+    if "jobs_ready" not in st.session_state:
+        st.session_state.jobs_ready = False                                                                 
 
 def clear_variables():
+    load_dotenv(override=True)
+    st.session_state.testing_mode = os.getenv("TESTING_MODE", "False").lower() == "true"
+    st.session_state.run_prefix = "test-" if st.session_state.testing_mode else "" 
     st.session_state.results = []
     st.session_state.save_completed = False
     st.session_state.cost_data_path = ""
@@ -110,10 +116,11 @@ def clear_variables():
     st.session_state.selected_model_name = ""
     st.session_state.model_name = ""
     st.session_state.selected_prompt_name = ""
-    st.session_state.selected_prompt_text = "" 
+    st.session_state.selected_prompt_text = ""
+    st.session_state.jobs_ready = False  
     # Explicitly reset the radio button key
     if "selected_task" in st.session_state:
-        del st.session_state["selected_task"]
+        del st.session_state["selected_task"]       
 
 def address_error():
     msg = st.session_state.results[-1]["message"]
@@ -128,16 +135,6 @@ def address_error():
         st.rerun()
     else:
         st.radio("How to Proceeed?:", proceed_options, index=None, key="proceed_option", on_change=handle_proceed_option)        
-
-def begin_processing():
-    st.session_state.total_items = len(st.session_state.run_numbering)
-    init_jobs(len(st.session_state.run_numbering))
-    load_jobs()
-    st.session_state.progress = (st.session_state.jobs_dict["num_total_jobs"] - st.session_state.jobs_dict["num_remaining_jobs"]) / st.session_state.jobs_dict.get("num_total_jobs", 1)
-    st.session_state.progress_bar.progress(max(st.session_state.progress, 0))
-    st.session_state.pause_button_enabled = False #st.toggle(label="Pause", key="pause_button", value=False)
-    if st.session_state.jobs_dict["to_process"] and not st.session_state.pause_button_enabled:
-        run_jobs()        
 
 def configure_inputs():
     #with st.session_state.configuration_container:
@@ -165,31 +162,29 @@ def create_directories():
         ensure_directory_exists(directory)
 
 def display_costs_summary():
-    with st.session_state.costs_container:
-        st.subheader("Cost Summary")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total Input Tokens", f"{st.session_state.cost_summary['tokens']['input']:,}")
-            st.metric("Total Output Tokens", f"{st.session_state.cost_summary['tokens']['output']:,}")
-            st.metric("Num Processed Successfully", f"{st.session_state.cost_summary['images_processed']:,}")
-        with col2:
-            st.metric("Input Cost Per Mil", f"{st.session_state.cost_summary['costs']['input_cost_per_mil']:.2f}")
-            st.metric("Output Cost Per Mil", f"{st.session_state.cost_summary['costs']['output_cost_per_mil']:.2f}")
-            st.metric("Processing Time", f"{st.session_state.cost_summary['processing_time_minutes']:.2f} min")
-        with col3:
-            st.metric("Total Input Cost", f"${st.session_state.cost_summary['costs']['input']:.4f}")
-            st.metric("Total Output Cost", f"${st.session_state.cost_summary['costs']['output']:.4f}")
-            st.metric("Total Overall Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")        
+    st.subheader("Cost Summary")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Input Tokens", f"{st.session_state.cost_summary['tokens']['input']:,}")
+        st.metric("Total Output Tokens", f"{st.session_state.cost_summary['tokens']['output']:,}")
+        st.metric("Num Processed Successfully", f"{st.session_state.cost_summary['images_processed']:,}")
+    with col2:
+        st.metric("Input Cost Per Mil", f"{st.session_state.cost_summary['costs']['input_cost_per_mil']:.2f}")
+        st.metric("Output Cost Per Mil", f"{st.session_state.cost_summary['costs']['output_cost_per_mil']:.2f}")
+        st.metric("Processing Time", f"{st.session_state.cost_summary['processing_time_minutes']:.2f} min")
+    with col3:
+        st.metric("Total Input Cost", f"${st.session_state.cost_summary['costs']['input']:.4f}")
+        st.metric("Total Output Cost", f"${st.session_state.cost_summary['costs']['output']:.4f}")
+        st.metric("Total Overall Cost", f"${st.session_state.cost_summary['costs']['total']:.4f}")        
 
 def display_file_saving_success():
-    with st.session_state.file_saving_success_container:
-        if "show_save_error" in st.session_state and st.session_state.show_save_error:
-            st.error(f"Error saving files: {st.session_state.save_error_message}")
-            st.session_state.show_save_error = False
-        elif "show_save_success" in st.session_state and st.session_state.show_save_success:
-            for filename in st.session_state.output_files:
-                st.success(f"File saved successfully: {filename}")
-            st.success(f"Cost data saved to: {st.session_state.cost_data_path}")
+    if "show_save_error" in st.session_state and st.session_state.show_save_error:
+        st.error(f"Error saving files: {st.session_state.save_error_message}")
+        st.session_state.show_save_error = False
+    elif "show_save_success" in st.session_state and st.session_state.show_save_success:
+        for filename in st.session_state.output_files:
+            st.success(f"File saved successfully: {filename}")
+        st.success(f"Cost data saved to: {st.session_state.cost_data_path}")
 
 def display_model_details(selected_model_obj):
     with st.expander("Model Details"):
@@ -205,19 +200,18 @@ def display_model_details(selected_model_obj):
         })           
 
 def display_results():
-    with st.session_state.results_container:
-        st.session_state.display_images = st.toggle("Display Images", value=True)
-        for result in st.session_state.results:
-            image_info, attempt_number, processing_data = result["image_info"], result["attempt_number"], result["processing_data"]
-            image_name, image_number, image_path, transcription, raw_llm_response = image_info.image_name, image_info.image_number, image_info.image_path, image_info.transcription, image_info.raw_llm_response[attempt_number][0]
-            display_name = image_name.split("/")[-1]
-            # use a unique expander name in case of multiple attempts
-            st.session_state[f"expander_{display_name}"] = st.expander(f"Image {image_number}, {display_name}, Attempt {attempt_number}: {result['status'].upper()}")
-            with st.session_state[f"expander_{display_name}"]:
-                if result["status"] == "success":
-                    display_successful_result_details(display_name, image_name, image_path, transcription, processing_data)
-                else:
-                    display_unsuccessful_results_details(display_name, image_name, image_path, result, raw_llm_response)
+    st.session_state.display_images = st.toggle("Display Images", value=True)
+    for result in st.session_state.results:
+        image_info, attempt_number, processing_data = result["image_info"], result["attempt_number"], result["processing_data"]
+        image_name, image_number, image_path, transcription, raw_llm_response = image_info.image_name, image_info.image_number, image_info.image_path, image_info.transcription, image_info.raw_llm_response[attempt_number][0]
+        display_name = image_name.split("/")[-1]
+        # use a unique expander name in case of multiple attempts
+        st.session_state[f"expander_{display_name}"] = st.expander(f"Image {image_number}, {display_name}, Attempt {attempt_number}: {result['status'].upper()}")
+        with st.session_state[f"expander_{display_name}"]:
+            if result["status"] == "success":
+                display_successful_result_details(display_name, image_name, image_path, transcription, processing_data)
+            else:
+                display_unsuccessful_results_details(display_name, image_name, image_path, result, raw_llm_response)
 
 def display_selected_prompt_text(selected_prompt_text):
     with st.expander("View Selected Prompt"):
@@ -447,21 +441,21 @@ def load_saved_data(data_filename):
     with open(os.path.join(DATA_DIR, data_filename), "r") as f:
         data = json.load(f)
     st.session_state.time_start = get_timestamp()
-    selected_model = data["model"]
-    model_name = data["model_name"]
-    prompt_name = data["prompt_name"]
-    prompt_text = load_prompts()[prompt_name]
+    st.session_state.selected_model = data["model"]
+    st.session_state.model_name = data["model_name"]
+    st.session_state.selected_prompt_name = data["prompt_name"]
+    st.session_state.selected_prompt_text = load_prompts()[st.session_state.selected_prompt_name]
     missing_transcriptions = data["incomplete_jobs"]
     st.session_state.volume_name = data["run_id"]
-    output_format = data["output_format"].split(".")[-1].upper()
-    st.session_state.chunk_size = data["chunk_size"]
-    st.session_state.io_manager = InputOutputManager(st.session_state.volume_name, selected_model, model_name, prompt_name, prompt_text, output_format)
-    st.session_state.run_numbering = st.session_state.io_manager.load_run_numbering(data["run_numbering"], st.session_state.chunk_size)    
-    return missing_transcriptions       
+    st.session_state.output_format = data["output_format"].split(".")[-1].upper()
+    st.session_state.chunk_size = data["chunk_size"]  
+    return data       
 
 def load_saved_run(data_filename):
-    missing_transcriptions = load_saved_data(data_filename)
-    return missing_transcriptions
+    data = load_saved_data(data_filename)
+    st.session_state.io_manager = InputOutputManager(st.session_state.volume_name, st.session_state.selected_model, st.session_state.model_name, st.session_state.selected_prompt_name, st.session_state.selected_prompt_text, st.session_state.output_format)
+    st.session_state.run_numbering = st.session_state.io_manager.load_run_numbering(data["run_numbering"], st.session_state.chunk_size)
+    return True
 
 def move_to_completed_list(jobs, image_info):
     jobs["completed"].append(image_info.image_name)
@@ -598,7 +592,7 @@ def save_cost_data():
     chunk_size = st.session_state.chunk_size
     associated_transcription_filenames = st.session_state.output_files
     output_format = st.session_state.io_manager.output_format
-    filename = f"{DATA_DIR}/{RUN_PREFIX}{volume_name}-data.json"
+    filename = f"{DATA_DIR}/{st.session_state.run_prefix}{volume_name}-data.json"
     run_numbering = st.session_state.io_manager.get_run_numbering()
     overall_costs, image_data, incomplete_jobs, completed_jobs = tally_data(run_numbering)
     input_cost_per_mil = st.session_state.io_manager.processor.input_cost_per_mil
@@ -673,13 +667,8 @@ def select_and_load_run():
         return
     selected_run = st.selectbox("Select a saved run:", saved_runs)
     if st.button("Load Run"):
-        missing_transcriptions = load_saved_run(selected_run)
-        use_urls = "http" in missing_transcriptions[0]
-        urls = missing_transcriptions if use_urls else []
-        local_image_paths = missing_transcriptions if not use_urls else []
-        st.session_state.process_button_clicked = True
-        has_valid_input = True
-
+        load_saved_run(selected_run)
+        
 def select_input_method():
     st.session_state.input_method = st.radio(
         "Choose input method:",
@@ -736,7 +725,15 @@ def select_prompt():
     prompts = load_prompts()
     st.session_state.selected_prompt_name = st.selectbox("Choose a prompt:", list(prompts.keys()), disabled=not st.session_state.selected_model)
     st.session_state.selected_prompt_text = prompts[st.session_state.selected_prompt_name]
-    display_selected_prompt_text(st.session_state.selected_prompt_text)            
+    display_selected_prompt_text(st.session_state.selected_prompt_text) 
+
+def setup_jobs():
+    st.session_state.total_items = len(st.session_state.run_numbering)
+    init_jobs(len(st.session_state.run_numbering))
+    load_jobs()
+    st.session_state.progress = (st.session_state.jobs_dict["num_total_jobs"] - st.session_state.jobs_dict["num_remaining_jobs"]) / st.session_state.jobs_dict.get("num_total_jobs", 1)
+    st.session_state.progress_bar.progress(max(st.session_state.progress, 0))
+    st.session_state.pause_button_enabled = False                 
 
 def set_start_time():
     if "start_time" not in st.session_state:
@@ -790,51 +787,55 @@ def main():
                 if not st.session_state.process_button_clicked and (st.session_state.uploaded_file or st.session_state.selected_local_images):
                     process_button_disabled = False
                     ###### ->                              allow for input changes if processing has not begun
-                    if not st.session_state.io_manager or st.session_state.io_manager and not st.session_state.io_manager.processing_begun:
+                    if not st.session_state.io_manager or st.session_state.io_manager and not st.session_state.io_manager.inputs_committed:
                         st.session_state.io_manager = InputOutputManager(run_name=st.session_state.volume_name, model=st.session_state.selected_model, model_name=st.session_state.model_name, prompt_name=st.session_state.selected_prompt_name, prompt_text=st.session_state.selected_prompt_text, output_format=st.session_state.output_format)
                         st.session_state.fieldnames = utils.get_fieldnames_from_prompt_text(st.session_state.selected_prompt_text)
-                st.session_state.process_button_clicked = st.button("Process Images", type="primary", disabled=process_button_disabled)   
-                if st.session_state.process_button_clicked:
-                    st.session_state.io_manager.processing_begun = True    
+                st.session_state.process_button_clicked = st.button("Process Images", type="primary", disabled=process_button_disabled)     
         elif st.session_state.task_option == "Complete Saved Run":
             st.session_state.complete_saved_run_container = st.container()
             with st.session_state.complete_saved_run_container:
                 st.header("Complete Saved Run")
-                st.session_state.process_button_clicked = False
                 select_and_load_run()
+                st.session_state.process_button_clicked = True
     ## begin processing images
     if st.session_state.process_button_clicked:
         progress = max(st.session_state.get("progress", 0), 0)
         st.session_state.progress_bar = st.progress(progress)
         status_text = st.empty()
         st.success("Processing started...")
-        if st.session_state.task_option == "New Run":
-            st.session_state.pre_process_inputs_container = st.container()
-            with st.session_state.pre_process_inputs_container:
-                pre_process_inputs()     
-        # Start Setting Up Jobs
-        if st.session_state.run_numbering:
+        st.session_state.setup_jobs_container = st.container()
+        with st.session_state.setup_jobs_container:
+            if not st.session_state.jobs_ready:
+                if st.session_state.task_option == "New Run":
+                    pre_process_inputs()
+                setup_jobs()    
+                st.session_state.jobs_ready = True
+        if st.session_state.jobs_ready and st.session_state.jobs_dict["to_process"]:
             st.session_state.processing_container = st.container()
             with st.session_state.processing_container:
-                begin_processing()
+                run_jobs()
     if st.session_state.error_flag:
         st.session_state.error_container = st.container()
         with st.session_state.error_container:
             address_error()
     # Display Costs
-    st.session_state.costs_container = st.container()
     if st.session_state.results and st.session_state.io_manager and st.session_state.io_manager.run_numbering:
-        create_costs_summary()
-        display_costs_summary()
-    st.session_state.file_saving_success_container = st.container()
-    display_file_saving_success()          
+        st.session_state.costs_container = st.container()
+        with st.session_state.costs_container:
+            create_costs_summary()
+            display_costs_summary()
+        st.session_state.file_saving_success_container = st.container()
+        with st.session_state.file_saving_success_container:
+            display_file_saving_success()          
     # Display Results     
     if st.session_state.results:
         st.header("Results")
         st.session_state.success_counts_container = st.container()
-        display_success_counts()
-        st.session_state.results_container = st.container()  
-        display_results()
+        with st.session_state.success_counts_container:
+            display_success_counts()
+        st.session_state.results_container = st.container()
+        with st.session_state.results_container:
+            display_results()
         
     
 if __name__ == "__main__":
