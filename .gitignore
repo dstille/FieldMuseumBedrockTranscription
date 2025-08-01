@@ -7,7 +7,7 @@ logs/
 data/
 debug_results/
 testing_archive/
-test_results/
+testing/test_results/
 images_to_upload/
 
 # Environment variables

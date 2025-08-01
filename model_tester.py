@@ -21,11 +21,11 @@ from utilities.base64_filter import filter_base64, filter_base64_from_dict
 class ModelTester:
     """Tests AWS Bedrock models for image processing capabilities."""
     
-    def __init__(self, prompt_file: str = "prompts/1.5Stripped.txt", test_image: str = "test_images/Test_Image.jpg"):
+    def __init__(self, prompt_file: str = "prompts/1.5Stripped.txt", test_image: str = "testing/test_images/Test_Image.jpg"):
         """Initialize the ModelTester."""
         self.prompt_text = self.load_prompt_text(prompt_file)
         self.base64_image = self.image_to_base64(test_image)
-        self.output_dir = Path("test_results")
+        self.output_dir = Path("testing/test_results")
         self.output_dir.mkdir(exist_ok=True)
     
     def load_prompt_text(self, prompt_file: str) -> str:
@@ -108,7 +108,8 @@ class ModelTester:
             
             # Process the image
             start_time = time.time()
-            text, processing_data = processor.process_image(self.base64_image, "Test_Image", 0)
+            # text, processing_data, raw_response    # process_image(self, base64_image: str, image_name: str, image_index: int)
+            text, processing_data, raw_response = processor.process_image(self.base64_image, "Test_Image", 0)
             elapsed_time = time.time() - start_time
             
             # Check if the test was successful

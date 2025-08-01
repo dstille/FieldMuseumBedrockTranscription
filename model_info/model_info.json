@@ -16,11 +16,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-image-generator-v1:0",
@@ -40,11 +41,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-image-generator-v1",
@@ -64,11 +66,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-image-generator-v2:0",
@@ -89,11 +92,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-premier-v1:0:8k",
@@ -112,11 +116,12 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:20k",
@@ -135,11 +140,12 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:1000k",
@@ -158,11 +164,12 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:mm",
@@ -181,11 +188,12 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0",
@@ -206,11 +214,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.titan-text-premier-v1:0",
@@ -229,11 +238,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-pro-v1:0:24k",
@@ -255,10 +265,11 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-pro-v1:0:300k",
@@ -280,10 +291,11 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-pro-v1:0",
@@ -306,10 +318,11 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": true,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0:24k",
@@ -330,11 +343,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0:300k",
@@ -355,11 +369,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0",
@@ -381,11 +396,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": true,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-canvas-v1:0",
@@ -406,11 +422,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-reel-v1:0",
@@ -430,11 +447,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-reel-v1:1",
@@ -454,11 +472,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-micro-v1:0:24k",
@@ -477,11 +496,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.035,
+      "output": 0.14
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-micro-v1:0:128k",
@@ -500,11 +520,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.035,
+      "output": 0.14
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-micro-v1:0",
@@ -524,11 +545,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.035,
+      "output": 0.14
     },
     "use_inference_profile": true,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-sonic-v1:0",
@@ -548,11 +570,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-g1-text-02",
@@ -571,11 +594,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-text-lite-v1:0:4k",
@@ -594,11 +618,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-text-lite-v1",
@@ -617,11 +642,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-text-express-v1:0:8k",
@@ -640,11 +666,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-text-express-v1",
@@ -663,11 +690,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-text-v1:2:8k",
@@ -686,11 +714,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-text-v1",
@@ -709,11 +738,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-text-v2:0:8k",
@@ -730,11 +760,12 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-text-v2:0",
@@ -753,11 +784,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-image-v1:0",
@@ -777,11 +809,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-image-v1",
@@ -801,11 +834,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "ai21.jamba-instruct-v1:0",
@@ -824,11 +858,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 4.0,
-      "output": 8.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "ai21.jamba-1-5-large-v1:0",
@@ -847,11 +882,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 4.0,
-      "output": 8.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "ai21.jamba-1-5-mini-v1:0",
@@ -870,11 +906,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 4.0,
-      "output": 8.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-instant-v1:2:100k",
@@ -893,11 +930,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-instant-v1",
@@ -916,11 +954,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2:0:18k",
@@ -939,11 +978,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2:0:100k",
@@ -962,11 +1002,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2:1:18k",
@@ -985,11 +1026,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2:1:200k",
@@ -1008,11 +1050,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2:1",
@@ -1031,11 +1074,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-v2",
@@ -1054,11 +1098,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:28k",
@@ -1078,11 +1123,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:200k",
@@ -1102,11 +1148,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
@@ -1126,11 +1173,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0:48k",
@@ -1150,11 +1198,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0:200k",
@@ -1174,11 +1223,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
@@ -1198,11 +1248,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:12k",
@@ -1222,11 +1273,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:28k",
@@ -1246,11 +1298,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:200k",
@@ -1270,11 +1323,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0",
@@ -1294,11 +1348,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -1319,11 +1374,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
@@ -1343,11 +1399,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-7-sonnet-20250219-v1:0",
@@ -1367,11 +1424,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
@@ -1390,11 +1448,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-text-v14:7:4k",
@@ -1413,11 +1472,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-text-v14",
@@ -1436,11 +1496,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-r-v1:0",
@@ -1459,11 +1520,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-r-plus-v1:0",
@@ -1482,11 +1544,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-light-text-v14:7:4k",
@@ -1505,11 +1568,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.command-light-text-v14",
@@ -1528,11 +1592,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.embed-english-v3:0:512",
@@ -1551,11 +1616,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.embed-english-v3",
@@ -1574,11 +1640,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.embed-multilingual-v3:0:512",
@@ -1597,11 +1664,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "cohere.embed-multilingual-v3",
@@ -1620,11 +1688,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 3.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "deepseek.r1-v1:0",
@@ -1643,11 +1712,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 1.0,
-      "output": 2.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-8b-instruct-v1:0",
@@ -1666,11 +1736,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-70b-instruct-v1:0",
@@ -1689,11 +1760,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-1-8b-instruct-v1:0",
@@ -1712,11 +1784,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-1-70b-instruct-v1:0",
@@ -1735,11 +1808,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-2-11b-instruct-v1:0",
@@ -1759,11 +1833,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.16,
+      "output": 0.16
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama3-2-90b-instruct-v1:0",
@@ -1783,11 +1858,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.72,
+      "output": 0.72
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama3-2-1b-instruct-v1:0",
@@ -1806,11 +1882,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-2-3b-instruct-v1:0",
@@ -1829,11 +1906,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama3-3-70b-instruct-v1:0",
@@ -1852,11 +1930,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": false
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0:128k",
@@ -1876,11 +1955,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0:10m",
@@ -1900,11 +1980,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0",
@@ -1924,11 +2005,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0:128k",
@@ -1948,11 +2030,12 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0:1m",
@@ -1965,11 +2048,12 @@
     "lifecycle_status": "",
     "inferenceTypes": [],
     "pricing": {
-      "input": 1.0,
-      "output": 2.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": false,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0",
@@ -1989,11 +2073,12 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   },
   {
     "modelId": "mistral.mistral-7b-instruct-v0:2",
@@ -2012,11 +2097,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "mistral.mixtral-8x7b-instruct-v0:1",
@@ -2035,11 +2121,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "mistral.mistral-large-2402-v1:0",
@@ -2058,11 +2145,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "mistral.mistral-small-2402-v1:0",
@@ -2081,11 +2169,12 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
-    "on_demand_supported": true
+    "on_demand_supported": true,
+    "pricing_verified": false
   },
   {
     "modelId": "mistral.pixtral-large-2502-v1:0",
@@ -2105,10 +2194,11 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 2.0,
+      "output": 6.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   }
 ]

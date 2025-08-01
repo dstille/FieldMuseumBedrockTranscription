@@ -17,20 +17,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:51",
+    "last_test_timestamp": "2025-08-01 10:21:06",
     "last_test_details": {
-      "elapsed_seconds": 0.9571707248687744,
+      "elapsed_seconds": 0.8323996067047119,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-image-generator-v1",
@@ -50,20 +51,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:53",
+    "last_test_timestamp": "2025-08-01 10:21:08",
     "last_test_details": {
-      "elapsed_seconds": 0.9002032279968262,
+      "elapsed_seconds": 0.7437260150909424,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-image-generator-v2:0",
@@ -84,20 +86,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:54",
+    "last_test_timestamp": "2025-08-01 10:21:09",
     "last_test_details": {
-      "elapsed_seconds": 1.0003142356872559,
+      "elapsed_seconds": 0.8487889766693115,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-premier-v1:0:8k",
@@ -116,20 +119,21 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:56",
+    "last_test_timestamp": "2025-08-01 10:21:10",
     "last_test_details": {
-      "elapsed_seconds": 1.0688493251800537,
+      "elapsed_seconds": 0.6871061325073242,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:20k",
@@ -148,20 +152,21 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:58",
+    "last_test_timestamp": "2025-08-01 10:21:12",
     "last_test_details": {
-      "elapsed_seconds": 0.8026525974273682,
+      "elapsed_seconds": 0.6976854801177979,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:1000k",
@@ -180,20 +185,21 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:49:59",
+    "last_test_timestamp": "2025-08-01 10:21:13",
     "last_test_details": {
-      "elapsed_seconds": 0.8552827835083008,
+      "elapsed_seconds": 0.698366641998291,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0:mm",
@@ -212,20 +218,21 @@
     "lifecycle_status": "ACTIVE",
     "inferenceTypes": [],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:00",
+    "last_test_timestamp": "2025-08-01 10:21:14",
     "last_test_details": {
-      "elapsed_seconds": 1.1317172050476074,
+      "elapsed_seconds": 0.731071949005127,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-premier-v1:0",
@@ -246,20 +253,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 2.5,
+      "output": 12.5
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:50:02",
+    "last_test_timestamp": "2025-08-01 10:21:15",
     "last_test_details": {
-      "elapsed_seconds": 18.68827176094055,
+      "elapsed_seconds": 16.563811540603638,
       "input_tokens": 3416,
-      "output_tokens": 478,
-      "total_cost": 0.004,
+      "output_tokens": 469,
+      "total_cost": 0.015,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-pro-v1:0:24k",
@@ -281,19 +289,20 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:21",
+    "last_test_timestamp": "2025-08-01 10:21:32",
     "last_test_details": {
-      "elapsed_seconds": 1.037578821182251,
+      "elapsed_seconds": 0.6895325183868408,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-pro-v1:0:300k",
@@ -315,19 +324,20 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:23",
+    "last_test_timestamp": "2025-08-01 10:21:33",
     "last_test_details": {
-      "elapsed_seconds": 0.9059264659881592,
+      "elapsed_seconds": 0.6812927722930908,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-pro-v1:0",
@@ -350,19 +360,20 @@
     ],
     "pricing": {
       "input": 0.8,
-      "output": 1.6
+      "output": 3.2
     },
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:50:25",
+    "last_test_timestamp": "2025-08-01 10:21:34",
     "last_test_details": {
-      "elapsed_seconds": 7.211533308029175,
+      "elapsed_seconds": 7.620975732803345,
       "input_tokens": 3383,
-      "output_tokens": 411,
+      "output_tokens": 430,
       "total_cost": 0.004,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0:24k",
@@ -383,20 +394,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:32",
+    "last_test_timestamp": "2025-08-01 10:21:42",
     "last_test_details": {
-      "elapsed_seconds": 0.7947797775268555,
+      "elapsed_seconds": 0.6772880554199219,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0:300k",
@@ -417,20 +429,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:34",
+    "last_test_timestamp": "2025-08-01 10:21:43",
     "last_test_details": {
-      "elapsed_seconds": 0.8365161418914795,
+      "elapsed_seconds": 0.670412540435791,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-lite-v1:0",
@@ -452,20 +465,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.06,
+      "output": 0.24
     },
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:50:35",
+    "last_test_timestamp": "2025-08-01 10:21:45",
     "last_test_details": {
-      "elapsed_seconds": 5.188994884490967,
+      "elapsed_seconds": 5.270912408828735,
       "input_tokens": 3383,
-      "output_tokens": 536,
-      "total_cost": 0.004,
+      "output_tokens": 458,
+      "total_cost": 0.0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "amazon.nova-canvas-v1:0",
@@ -486,20 +500,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:41",
+    "last_test_timestamp": "2025-08-01 10:21:50",
     "last_test_details": {
-      "elapsed_seconds": 0.8474175930023193,
+      "elapsed_seconds": 0.7374849319458008,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-reel-v1:0",
@@ -519,20 +534,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:43",
+    "last_test_timestamp": "2025-08-01 10:21:52",
     "last_test_details": {
-      "elapsed_seconds": 1.0455713272094727,
+      "elapsed_seconds": 0.7217843532562256,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.nova-reel-v1:1",
@@ -552,20 +568,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:44",
+    "last_test_timestamp": "2025-08-01 10:21:53",
     "last_test_details": {
-      "elapsed_seconds": 0.988806962966919,
+      "elapsed_seconds": 0.663977861404419,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-image-v1:0",
@@ -585,20 +602,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:46",
+    "last_test_timestamp": "2025-08-01 10:21:54",
     "last_test_details": {
-      "elapsed_seconds": 0.8441441059112549,
+      "elapsed_seconds": 0.673168420791626,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "amazon.titan-embed-image-v1",
@@ -618,20 +636,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 0.8,
-      "output": 1.6
+      "input": 0.0,
+      "output": 0.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:47",
+    "last_test_timestamp": "2025-08-01 10:21:55",
     "last_test_details": {
-      "elapsed_seconds": 0.8568217754364014,
+      "elapsed_seconds": 0.6964616775512695,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": false
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:28k",
@@ -651,20 +670,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:49",
+    "last_test_timestamp": "2025-08-01 10:21:56",
     "last_test_details": {
-      "elapsed_seconds": 0.9748640060424805,
+      "elapsed_seconds": 1.1606755256652832,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:200k",
@@ -684,20 +704,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:50:50",
+    "last_test_timestamp": "2025-08-01 10:21:58",
     "last_test_details": {
-      "elapsed_seconds": 0.8319430351257324,
+      "elapsed_seconds": 1.8991246223449707,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
@@ -717,20 +738,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:50:52",
+    "last_test_timestamp": "2025-08-01 10:22:00",
     "last_test_details": {
-      "elapsed_seconds": 17.23848056793213,
+      "elapsed_seconds": 17.174728631973267,
       "input_tokens": 3209,
-      "output_tokens": 551,
-      "total_cost": 0.039,
+      "output_tokens": 547,
+      "total_cost": 0.018000000000000002,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0:48k",
@@ -750,20 +772,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:10",
+    "last_test_timestamp": "2025-08-01 10:22:18",
     "last_test_details": {
-      "elapsed_seconds": 0.9677953720092773,
+      "elapsed_seconds": 0.756739616394043,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0:200k",
@@ -783,20 +806,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:11",
+    "last_test_timestamp": "2025-08-01 10:22:19",
     "last_test_details": {
-      "elapsed_seconds": 0.8419189453125,
+      "elapsed_seconds": 0.9851138591766357,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
@@ -816,20 +840,21 @@
       "ON_DEMAND"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 0.8,
+      "output": 4.0
     },
     "use_inference_profile": false,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:51:13",
+    "last_test_timestamp": "2025-08-01 10:22:20",
     "last_test_details": {
-      "elapsed_seconds": 7.386662483215332,
+      "elapsed_seconds": 7.911367416381836,
       "input_tokens": 3209,
-      "output_tokens": 577,
-      "total_cost": 0.04,
+      "output_tokens": 564,
+      "total_cost": 0.005,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:12k",
@@ -849,20 +874,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:21",
+    "last_test_timestamp": "2025-08-01 10:22:29",
     "last_test_details": {
-      "elapsed_seconds": 1.1607263088226318,
+      "elapsed_seconds": 0.6935808658599854,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:28k",
@@ -882,20 +908,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:23",
+    "last_test_timestamp": "2025-08-01 10:22:30",
     "last_test_details": {
-      "elapsed_seconds": 1.0686030387878418,
+      "elapsed_seconds": 0.7471427917480469,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0:200k",
@@ -915,20 +942,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:25",
+    "last_test_timestamp": "2025-08-01 10:22:31",
     "last_test_details": {
-      "elapsed_seconds": 1.1147894859313965,
+      "elapsed_seconds": 0.7359650135040283,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-opus-20240229-v1:0",
@@ -948,20 +976,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 15.0,
+      "output": 75.0
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:51:27",
+    "last_test_timestamp": "2025-08-01 10:22:32",
     "last_test_details": {
-      "elapsed_seconds": 1.3311774730682373,
+      "elapsed_seconds": 0.7922229766845703,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -982,20 +1011,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
     "on_demand_supported": true,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:51:28",
+    "last_test_timestamp": "2025-08-01 10:22:34",
     "last_test_details": {
-      "elapsed_seconds": 17.92902421951294,
+      "elapsed_seconds": 17.89733052253723,
       "input_tokens": 3209,
-      "output_tokens": 554,
-      "total_cost": 0.039,
+      "output_tokens": 562,
+      "total_cost": 0.018000000000000002,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
@@ -1015,20 +1045,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:51:47",
+    "last_test_timestamp": "2025-08-01 10:22:52",
     "last_test_details": {
-      "elapsed_seconds": 20.371103525161743,
+      "elapsed_seconds": 18.79592776298523,
       "input_tokens": 3209,
-      "output_tokens": 524,
-      "total_cost": 0.039,
+      "output_tokens": 510,
+      "total_cost": 0.018000000000000002,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "anthropic.claude-3-7-sonnet-20250219-v1:0",
@@ -1048,20 +1079,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 8.0,
-      "output": 24.0
+      "input": 3.0,
+      "output": 15.0
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": true,
-    "last_test_timestamp": "2025-05-20 15:52:08",
+    "last_test_timestamp": "2025-08-01 10:23:12",
     "last_test_details": {
-      "elapsed_seconds": 16.05280089378357,
+      "elapsed_seconds": 16.012049436569214,
       "input_tokens": 3209,
-      "output_tokens": 564,
-      "total_cost": 0.04,
+      "output_tokens": 575,
+      "total_cost": 0.019,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama3-2-11b-instruct-v1:0",
@@ -1081,20 +1113,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.16,
+      "output": 0.16
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:25",
+    "last_test_timestamp": "2025-08-01 10:23:29",
     "last_test_details": {
-      "elapsed_seconds": 1.6148681640625,
+      "elapsed_seconds": 0.10589241981506348,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama3-2-90b-instruct-v1:0",
@@ -1114,20 +1147,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.72,
+      "output": 0.72
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:27",
+    "last_test_timestamp": "2025-08-01 10:23:29",
     "last_test_details": {
-      "elapsed_seconds": 0.9287703037261963,
+      "elapsed_seconds": 0.06848931312561035,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0:128k",
@@ -1147,20 +1181,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:28",
+    "last_test_timestamp": "2025-08-01 10:23:30",
     "last_test_details": {
-      "elapsed_seconds": 0.9902844429016113,
+      "elapsed_seconds": 0.06893467903137207,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0:10m",
@@ -1180,20 +1215,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:30",
+    "last_test_timestamp": "2025-08-01 10:23:30",
     "last_test_details": {
-      "elapsed_seconds": 0.9565801620483398,
+      "elapsed_seconds": 0.059969186782836914,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-scout-17b-instruct-v1:0",
@@ -1213,20 +1249,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.17,
+      "output": 0.66
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:31",
+    "last_test_timestamp": "2025-08-01 10:23:31",
     "last_test_details": {
-      "elapsed_seconds": 1.1257152557373047,
+      "elapsed_seconds": 0.09152865409851074,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0:128k",
@@ -1246,20 +1283,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:33",
+    "last_test_timestamp": "2025-08-01 10:23:31",
     "last_test_details": {
-      "elapsed_seconds": 0.9095363616943359,
+      "elapsed_seconds": 0.06009817123413086,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0:1m",
@@ -1279,20 +1317,21 @@
       "PROVISIONED"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": false,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:35",
+    "last_test_timestamp": "2025-08-01 10:23:32",
     "last_test_details": {
-      "elapsed_seconds": 0.9933631420135498,
+      "elapsed_seconds": 0.070465087890625,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "meta.llama4-maverick-17b-instruct-v1:0",
@@ -1312,20 +1351,21 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 6.0,
-      "output": 6.0
+      "input": 0.24,
+      "output": 0.97
     },
     "use_inference_profile": true,
     "on_demand_supported": false,
     "image_test_success": false,
-    "last_test_timestamp": "2025-05-20 15:52:36",
+    "last_test_timestamp": "2025-08-01 10:23:32",
     "last_test_details": {
-      "elapsed_seconds": 1.4551715850830078,
+      "elapsed_seconds": 0.061876773834228516,
       "input_tokens": 0,
       "output_tokens": 0,
       "total_cost": 0,
       "error": ""
-    }
+    },
+    "pricing_verified": true
   },
   {
     "modelId": "mistral.pixtral-large-2502-v1:0",
@@ -1345,10 +1385,11 @@
       "INFERENCE_PROFILE"
     ],
     "pricing": {
-      "input": 7.0,
-      "output": 20.0
+      "input": 2.0,
+      "output": 6.0
     },
     "use_inference_profile": true,
-    "on_demand_supported": false
+    "on_demand_supported": false,
+    "pricing_verified": true
   }
 ]

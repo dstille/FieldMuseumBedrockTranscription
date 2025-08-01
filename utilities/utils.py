@@ -17,13 +17,18 @@ def parse_innermost_dict(d):
         d = "{" + inner_dict + "}"
         #### remove excess escape characters
         d = remove_extra_escape_chars(d)
-        print(f"{d = }")
         d = json.loads(d)
     if type(d) == dict and "text" in d:
         d = d["text"]
     if type(d) == dict and "transcription" in d:
         d = d["transcription"]
-    return d  
+    d = clean_values(d)    
+    return d
+
+def clean_values(data):
+    for fieldname, val in data.items():
+        data[fieldname] = val.replace('\n', ' ').replace('\r', ' ') if type(val) == str else " | ".join(val) if type(val) == list else val
+    return data          
 
 def striplines(text):
     return [s.strip() for s in text.splitlines()]
@@ -403,21 +408,31 @@ def batch_convert_prompts(input_dir: str, output_dir: str, to_json: bool = True)
 
 def remove_extra_escape_chars(text: str) -> str:
     """
-    Remove extra escape characters from a string.
+    Remove excess escape characters while preserving unicode and special characters.
+    Handles double-escaped strings that cause JSON decode errors.
 
     Args:
-        text: The input string
+        text: The input string with excess escapes
 
     Returns:
-        The string with extra escape characters removed
+        The string with excess escape characters removed
     """
-    temp =  re.sub(r'\\(\')', r'\1', text)
-    # find unicode chars with extra '\'
-    matches = re.findall(r'\\u([0-9a-fA-F]{4})', temp)
-    for match in matches:
-        temp = temp.replace(f"\\u{match}", chr(int(match, 16)))
-    #temp = re.sub(r"\\", "", temp)    
-    return temp           
+    # Fix escaped single quotes in JSON strings
+    text = re.sub(r"\\(')", r"\1", text)
+    
+    # Remove double backslashes (but not before unicode sequences)
+    text = re.sub(r'\\\\(?!u[0-9a-fA-F]{4})', r'\\', text)
+    
+    # Fix double-escaped quotes
+    text = re.sub(r'\\\\"', r'"', text)
+    text = re.sub(r'\\\\\'', r"'", text)
+    
+    # Fix other common double escapes
+    text = re.sub(r'\\\\n', r'\n', text)
+    text = re.sub(r'\\\\t', r'\t', text)
+    text = re.sub(r'\\\\r', r'\r', text)
+    
+    return text           
 
 if __name__ == "__main__":
     # Example usage

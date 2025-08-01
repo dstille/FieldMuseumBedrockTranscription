@@ -35,26 +35,28 @@ The application supports various models for image transcription:
 
 - **Claude Models**: Claude 3.5 Sonnet, Claude 3.5 Sonnet v2, Claude 3.7 Sonnet
 - **Amazon Nova Models**: Nova Pro, Nova Lite, Nova Premier
-- **Meta Models**: LLaMA models (requires SageMaker endpoints)
-- **Mistral Models**: Pixtral Large
 
 ## Usage
 
 1. Select a prompt from the dropdown menu
-2. Upload a text file containing image URLs (one per line)
+2. Upload a text file containing image URLs (one per line) or select image files from local computer
 3. Choose a model from the dropdown menu
 4. Select the output format (JSON, TXT, CSV)
 5. Click "Process Images" to start the transcription
 6. View and download the results
 
+## Reload Incomplete Runs
+
+If a run is incomplete, perhaps due to time constraints or throttling issues, that run may be reloaded and completed, without needing to repeat the above steps.
+
 ## Project Structure
 
 - `app.py`: Main Streamlit application
 - `bedrock_interface.py`: Interface for AWS Bedrock models
+- `input_output_manager.py`: Class files for managing inputs and transcription data
 - `llm_interface.py`: Base class for LLM interfaces
 - `model_factory.py`: Factory for creating model processors
 - `error_message.py`: Error handling utilities
-- `base64_filter.py`: Utilities for filtering base64 content
 - `vision_model_info.json`: Information about models that support image processing
 
 ## Error Handling
@@ -68,7 +70,7 @@ The application includes comprehensive error handling to help diagnose issues:
 
 ## Data Directories
 
-- `temp_images/`: Temporary storage for downloaded images
+- `temp_images/`: Temporary storage for indexed images
 - `transcriptions/`: Output directory for transcriptions
 - `raw_llm_responses/`: Raw responses from LLM models
 - `prompts/`: Text prompts for the models

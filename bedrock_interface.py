@@ -1,5 +1,7 @@
 import boto3
 import base64
+from PIL import Image
+import io
 import json
 import time
 import os
@@ -7,6 +9,7 @@ from typing import Dict, Any, Tuple, Optional
 from botocore.exceptions import ClientError
 from llm_interface import ImageProcessor
 from utilities.base64_filter import filter_base64, filter_base64_from_dict
+from dotenv import load_dotenv
 
 class BedrockImageProcessor(ImageProcessor):
     def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name):
@@ -98,7 +101,6 @@ class BedrockImageProcessor(ImageProcessor):
         if not self.model_info:
             return False
         inference_types = self.model_info.get("inferenceTypes", [])
-        print(f"Inference types: {inference_types}")
         return "INFERENCE_PROFILE" in inference_types
     
     def get_model_id(self) -> str:
@@ -120,8 +122,6 @@ class BedrockImageProcessor(ImageProcessor):
         request_body = self.format_prompt(base64_image)
         provider = self.model.split(".")[0] if "." in self.model else ""
         # TODO: Process differently based on provider, especially meta
-        if self.needs_inference_profile():
-                print(f"Using inference profile for model {self.model}")
         try:
             text, processing_data, raw_response = self._process_with_bedrock(request_body, base64_image, image_name, start_time)
             return text, processing_data, raw_response
@@ -133,7 +133,6 @@ class BedrockImageProcessor(ImageProcessor):
     def _process_with_bedrock(self, request_body: Dict[str, Any], base64_image: str, 
                              image_name: str, start_time: float) -> Tuple[str, Dict[str, Any]]:
         model_id = self.get_model_id()
-        print(f"Invoking model with ID: {model_id}")
         raw_response = None
         try:
             response = self.bedrock_client.invoke_model(
@@ -192,19 +191,20 @@ class BedrockImageProcessor(ImageProcessor):
 ####### Testing Module  #######
 import random
 RANDOM_ERROR_THRESHOLD = 0.25
-SAMPLE_DIRECTORY  = "raw_llm_responses"
-SAMPLE_FILE = "nova/httpsfm-digital-assetsfieldmuseumorg2298823C0399179Fjpg-2025-05-31-1632-09-raw.json"
+SAMPLE_DIRECTORY  = "testing/raw_llm_responses_for_testing"
+SAMPLE_FILE = "httpsfm-digital-assetsfieldmuseumorg2298823C0399179Fjpg-2025-05-31-1632-09-raw.json"
 
 class BedrockImageProcessorTesting(ImageProcessor):
-    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name, include_random_error=True):
+    def __init__(self, api_key, prompt_name, prompt_text, model, modelname, output_name):
         super().__init__(api_key, prompt_name, prompt_text, model, modelname, output_name)
+        load_dotenv()
         self.bedrock_client = boto3.client("bedrock-runtime")
         self.bedrock_mgmt = boto3.client("bedrock")
         self.model_info = None
         self.account_id = self._get_account_id()
         self.pricing_data = self.load_pricing_data()
         self.set_token_costs_per_mil()
-        self.include_random_error = include_random_error
+        self.include_random_error = os.getenv("INCLUDE_RANDOM_ERROR", "False").lower() == "true"
     
     def _get_account_id(self) -> str:
         """Get the AWS account ID."""
@@ -494,12 +494,29 @@ class AmazonImageProcessor(BedrockImageProcessor):
 class MetaImageProcessor(BedrockImageProcessor):
     """Specialized processor for Meta models."""
     
-    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+    def format_prompt(self, image_bytes, file_format) -> Dict[str, Any]:
         """Format the prompt for Meta models."""
         return {
             "prompt": self.prompt_text,
-            "image": base64_image
+            "image": {"format": file_format, "source": {"bytes": image_bytes}}
         }
+
+    def process_image(self, base64_image: str, image_name: str, image_index: int) -> Tuple[str, Dict[str, Any]]:
+        with open(f"testing/test_images/{image_name}.jpg", "rb") as f:
+            image_bytes = f.read()
+        file_format = image_name.split(".")[-1].lower()    
+        resized_image = self.resize_image(image_bytes)    
+        start_time = time.time()
+        request_body = self.format_prompt(resized_image, file_format)
+        provider = self.model.split(".")[0] if "." in self.model else ""
+        # TODO: Process differently based on provider, especially meta
+        try:
+            text, processing_data, raw_response = self._process_with_bedrock(request_body, base64_image, image_name, start_time)
+            return text, processing_data, raw_response
+        except Exception as e:
+            error_message = f"Error processing image: {str(e)}"
+            print(error_message)
+            return error_message, {"error": error_message}, raw_response    
     
     def update_usage(self, response_data: Dict[str, Any]):
         """Update token usage from Meta response data."""
@@ -535,7 +552,7 @@ class MistralImageProcessor(BedrockImageProcessor):
 
 
 # Factory function to create the appropriate processor
-def create_image_processor(api_key, prompt_name, prompt_text, model, modelname, output_name, testing=False):
+def create_image_processor(api_key, prompt_name, prompt_text, model, modelname, output_name="test", testing=False):
     """Create the appropriate image processor based on the model."""
     provider = model.split(".")[0] if "." in model else ""
     # Load model info to check if it has an inference profile

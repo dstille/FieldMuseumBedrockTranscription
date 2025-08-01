@@ -24,18 +24,10 @@ class ModelManager:
         self.region_prefix = self.region.split('-')[0]  # e.g., "us" from "us-east-1"
         
         # Pricing information per million tokens
-        self.pricing = {
-            "anthropic": {"input": 8.0, "output": 24.0},
-            "amazon": {"input": 0.8, "output": 1.6},
-            "meta": {"input": 6.0, "output": 6.0},
-            "mistral": {"input": 7.0, "output": 20.0},
-            "cohere": {"input": 3.0, "output": 6.0},
-            "ai21": {"input": 4.0, "output": 8.0},
-            "stability": {"input": 0.0, "output": 0.0}
-        }
+        self.pricing = self.load_model_pricing()
         
         # Default pricing for unknown providers
-        self.default_pricing = {"input": 1.0, "output": 2.0}
+        self.default_pricing = {"input": 0.0, "output": 0.0}
     
     def _get_account_id(self) -> str:
         """Get the AWS account ID."""
@@ -201,6 +193,10 @@ class ModelManager:
         
         on_demand_models = [model for model in vision_models if model.get("on_demand_supported", False)]
         print(f"Models with on-demand support: {len(on_demand_models)}")
+
+    def load_model_pricing(self):
+        with open("model_info/model_info.json", "r") as f:
+            return json.load(f)    
 
 def main():
     """Main function to build and save model information."""

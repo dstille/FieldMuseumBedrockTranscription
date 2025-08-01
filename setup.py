@@ -30,8 +30,10 @@ DIRECTORIES = [
     "prompts",
     "logs",
     "data",
-    "test_images",
-    "test_results",
+    "testing",
+    "testing/test_images",
+    "testing/test_results",
+    "testing/raw_llm_responses_for_testing",
     "model_info"  # Added model_info directory
 ]
 
@@ -121,6 +123,13 @@ AWS_REGION=us-east-1
 
 # Application Settings
 DEBUG=False
+COST_ADJUST_10_JUL_25=False
+INCLUDE_STACK_TRACE=False
+
+# Testing Settings
+TESTING_MODE=False
+INCLUDE_RANDOM_ERROR=False
+
 """
     
     try:
