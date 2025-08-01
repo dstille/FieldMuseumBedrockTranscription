@@ -23,6 +23,7 @@ def get_model_and_family_name(model_id):
     model_name_clean = model_name_long.split(':')[0]
     return family_name, model_name_clean
 
+
 def calculate_cost(input_tokens, output_tokens, pricing_info):
     input_cost = (input_tokens / 1_000_000) * pricing_info['input_token_price_per_1M']
     output_cost = (output_tokens / 1_000_000) * pricing_info['output_token_price_per_1M']
@@ -48,7 +49,6 @@ def main():
         if filename.endswith('.json'):
             filepath = os.path.join(DATA_DIR, filename)
             data = load_json(filepath)
-            
             model_id = data['model']
             family_name, model_name = get_model_and_family_name(model_id)
             
