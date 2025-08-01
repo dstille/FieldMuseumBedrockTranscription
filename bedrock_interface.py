@@ -1,5 +1,7 @@
 import boto3
 import base64
+from PIL import Image
+import io
 import json
 import time
 import os
@@ -492,12 +494,29 @@ class AmazonImageProcessor(BedrockImageProcessor):
 class MetaImageProcessor(BedrockImageProcessor):
     """Specialized processor for Meta models."""
     
-    def format_prompt(self, base64_image: str) -> Dict[str, Any]:
+    def format_prompt(self, image_bytes, file_format) -> Dict[str, Any]:
         """Format the prompt for Meta models."""
         return {
             "prompt": self.prompt_text,
-            "image": base64_image
+            "image": {"format": file_format, "source": {"bytes": image_bytes}}
         }
+
+    def process_image(self, base64_image: str, image_name: str, image_index: int) -> Tuple[str, Dict[str, Any]]:
+        with open(f"testing/test_images/{image_name}.jpg", "rb") as f:
+            image_bytes = f.read()
+        file_format = image_name.split(".")[-1].lower()    
+        resized_image = self.resize_image(image_bytes)    
+        start_time = time.time()
+        request_body = self.format_prompt(resized_image, file_format)
+        provider = self.model.split(".")[0] if "." in self.model else ""
+        # TODO: Process differently based on provider, especially meta
+        try:
+            text, processing_data, raw_response = self._process_with_bedrock(request_body, base64_image, image_name, start_time)
+            return text, processing_data, raw_response
+        except Exception as e:
+            error_message = f"Error processing image: {str(e)}"
+            print(error_message)
+            return error_message, {"error": error_message}, raw_response    
     
     def update_usage(self, response_data: Dict[str, Any]):
         """Update token usage from Meta response data."""
@@ -533,7 +552,7 @@ class MistralImageProcessor(BedrockImageProcessor):
 
 
 # Factory function to create the appropriate processor
-def create_image_processor(api_key, prompt_name, prompt_text, model, modelname, output_name, testing=False):
+def create_image_processor(api_key, prompt_name, prompt_text, model, modelname, output_name="test", testing=False):
     """Create the appropriate image processor based on the model."""
     provider = model.split(".")[0] if "." in model else ""
     # Load model info to check if it has an inference profile

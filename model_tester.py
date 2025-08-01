@@ -108,7 +108,8 @@ class ModelTester:
             
             # Process the image
             start_time = time.time()
-            text, processing_data = processor.process_image(self.base64_image, "Test_Image", 0)
+            # text, processing_data, raw_response    # process_image(self, base64_image: str, image_name: str, image_index: int)
+            text, processing_data, raw_response = processor.process_image(self.base64_image, "Test_Image", 0)
             elapsed_time = time.time() - start_time
             
             # Check if the test was successful

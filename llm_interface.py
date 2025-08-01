@@ -1,3 +1,5 @@
+from PIL import Image
+import io
 import time
 import json
 import os
@@ -62,7 +64,16 @@ class ImageProcessor:
                 } | self.get_token_costs()
 
     def get_legal_filename(self, filename):
-        return re.sub(r'[\\/*?:]', "_", filename)     
+        return re.sub(r'[\\/*?:]', "_", filename)
+
+    def resize_image(self, image_bytes, max_size=(1120, 1120)):
+        img = Image.open(io.BytesIO(image_bytes))
+        if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format=img.format)
+            return img_byte_arr.getvalue()
+        return image_bytes         
 
     def save_raw_response(self, response_data, image_name):
         legal_image_name = self.get_legal_filename(image_name)
