@@ -496,36 +496,97 @@ class MetaImageProcessor(BedrockImageProcessor):
     
     def format_prompt(self, image_bytes, file_format) -> Dict[str, Any]:
         """Format the prompt for Meta models."""
-        return {
-            "prompt": self.prompt_text,
-            "image": {"format": file_format, "source": {"bytes": image_bytes}}
-        }
+        prompt_text = self.prompt_text
+        if "json" not in prompt_text.lower():
+            prompt_text += "\n\nPlease provide the transcription as a JSON object with a 'transcription' field. Do not include any newlines, tabs or returns within individual fields."
+        return [
+            {
+                "role": "user",
+                "content": [
+                    {"image": {"format": file_format, "source": {"bytes": image_bytes}}},
+                    {"text": prompt_text},
+                ],
+            }
+        ]
+          
 
     def process_image(self, base64_image: str, image_name: str, image_index: int) -> Tuple[str, Dict[str, Any]]:
-        with open(f"testing/test_images/{image_name}.jpg", "rb") as f:
+        with open(f"temp_images/{image_name}", "rb") as f:
             image_bytes = f.read()
-        file_format = image_name.split(".")[-1].lower()    
+        file_format = image_name.split(".")[-1].lower()
+        file_format = "jpeg" if file_format == "jpg" else file_format    
         resized_image = self.resize_image(image_bytes)    
         start_time = time.time()
         request_body = self.format_prompt(resized_image, file_format)
         provider = self.model.split(".")[0] if "." in self.model else ""
         # TODO: Process differently based on provider, especially meta
         try:
-            text, processing_data, raw_response = self._process_with_bedrock(request_body, base64_image, image_name, start_time)
+            text, processing_data, raw_response = self._process_with_meta(request_body, base64_image, image_name, start_time)
+            print(f"{text = }")
             return text, processing_data, raw_response
         except Exception as e:
             error_message = f"Error processing image: {str(e)}"
             print(error_message)
             return error_message, {"error": error_message}, raw_response    
     
+    def _process_with_meta(self, request_body: Dict[str, Any], base64_image: str, 
+                                image_name: str, start_time: float) -> Tuple[str, Dict[str, Any]]:
+            model_id = self.get_model_id()
+            raw_response = None
+            try:
+                response = self.bedrock_client.converse(
+                    modelId=model_id,
+                    messages=request_body,
+                )
+                print(f"{response = }")
+                response_body = response#json.loads(response.get("body").read())
+                raw_response = self.save_raw_response(response_body, image_name)
+                text = self.extract_text(response_body)
+                self.update_usage(response_body)
+                # Calculate processing time
+                time_elapsed = (time.time() - start_time) / 60  # in minutes
+                processing_data = self.get_transcript_processing_data(time_elapsed)
+                self.num_processed += 1
+                return text, processing_data, raw_response
+            except Exception as e:
+                error_message = f"Error invoking model {model_id}: {str(e)}"
+                print(error_message)
+                # Add more context to the error message
+                if "AccessDeniedException" in str(e):
+                    error_message += "\nAccess denied: You may not have permissions to use this model or inference profile."
+                elif "ValidationException" in str(e) and "inference profile" in str(e).lower():
+                    error_message += "\nInference profile error: The inference profile may not be set up correctly."
+                elif "ResourceNotFoundException" in str(e):
+                    error_message += "\nResource not found: The model or inference profile may not exist."
+                return error_message, {"error": error_message}, raw_response
+    '''
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"image": {"format": "png", "source": {"bytes": image}}},
+                {"text": user_message},
+            ],
+        }
+    ]
+
+    response = bedrock_runtime.converse(
+        modelId=MODEL_ID,
+        messages=messages,
+    )
+    response_text = response["output"]["message"]["content"][0]["text"]
+    '''
+
+
     def update_usage(self, response_data: Dict[str, Any]):
         """Update token usage from Meta response data."""
         usage = response_data.get("usage", {})
-        self.input_tokens = usage.get("input_tokens", 0)
-        self.output_tokens = usage.get("output_tokens", 0)
+        self.input_tokens = usage.get("inputTokens", 0)
+        self.output_tokens = usage.get("outputTokens", 0)
     
     def extract_text(self, response_body: Dict[str, Any]) -> str:
         """Extract text from Meta response."""
+        return response_body["output"]["message"]["content"][0]["text"]
         return response_body.get("generation", "") or response_body.get("text", "")
 
 
