@@ -17,6 +17,7 @@ from input_output_manager import InputOutputManager
 from utilities import utils
 from utilities.adjust_costs import main as adjust_costs
 from utilities.error_message import ErrorMessage
+import mock_run
 
 # directories
 TEMP_IMAGES_DIR = "temp_images"
@@ -327,7 +328,7 @@ def get_saved_runs():
     return saved_runs
 
 def get_task_options():
-    return  ["New Run", "Complete Saved Run", "Reset App"]    
+    return  ["New Run", "Complete Saved Run", "Reset App", "Mock Run"]    
 
 def get_timestamp():
     return time.strftime("%Y-%m-%d-%H%M")
@@ -524,13 +525,13 @@ def pre_process_inputs():
 
 # Define the common image processing function
 def process_single_image(image_info):
-    image_name, image_number, base64_image = image_info.image_name, image_info.image_number, image_info.base64_image
+    image_name, image_number, base64_image, local_image_name = image_info.image_name, image_info.image_number, image_info.base64_image, image_info.local_image_name
     print(f"Processing {image_name} @ {get_timestamp()}")
     processing_data, raw_response = None, None 
     try:
         processor = st.session_state.io_manager.processor
         image_info.increment_number_attempts()
-        content, processing_data, raw_response = processor.process_image(base64_image, image_name, image_number)
+        content, processing_data, raw_response = processor.process_image(base64_image, local_image_name, image_number)
         if "error" in processing_data:
             raise Exception(processing_data["error"])
         transcription_data = ensure_data_is_json(content)
@@ -797,6 +798,9 @@ def main():
                 st.header("Complete Saved Run")
                 select_and_load_run()
                 st.session_state.process_button_clicked = True
+        elif st.session_state.task_option == "Mock Run":
+            st.session_state.io_manager, st.session_state.fieldnames, st.session_state.run_numbering = mock_run.get_mock_setup()
+            st.session_state.process_button_clicked = True        
     ## begin processing images
     if st.session_state.process_button_clicked:
         progress = max(st.session_state.get("progress", 0), 0)
