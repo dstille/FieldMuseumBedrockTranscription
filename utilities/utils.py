@@ -58,6 +58,9 @@ def csv_to_transcriptions(fname):
     return {image_name: data for image_name, data in zip(image_names, data_no_image_names)} 
 
 def convert_text_to_dict(text, fieldnames):
+    print(f"converting {text = }")
+    text = text.replace("*", "")
+    print(f"new: {text = }")
     lines = striplines(text)
     result = {fieldname: "" for fieldname in fieldnames}
     for line in lines:

@@ -261,8 +261,12 @@ def display_unsuccessful_results_details(display_name, image_name, image_path, r
         st.write(raw_llm_response)                               
 
 def ensure_data_is_json(data):
-    d = utils.parse_innermost_dict(data)
-    return d if type(d)==dict else {"transcription": d}
+    try:
+        d = utils.parse_innermost_dict(data)
+        return d if type(d)==dict else {"transcription": d}
+    except:
+        fieldnames = st.session_state.io_manager.fieldnames
+        return utils.convert_text_to_dict(data, fieldnames)    
 
 def ensure_directory_exists(directory):
     if not os.path.exists(directory):
