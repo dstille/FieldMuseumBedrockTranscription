@@ -22,6 +22,13 @@ def parse_innermost_dict(d):
         d = d["text"]
     if type(d) == dict and "transcription" in d:
         d = d["transcription"]
+    if type(d) == dict and "transcript" in d:
+        d = d["transcript"]
+    if type(d) == dict:
+        for k,v in d.items():
+            if type(v) == d:
+                d = v
+                break      
     d = clean_values(d)    
     return d
 
@@ -58,13 +65,34 @@ def csv_to_transcriptions(fname):
     return {image_name: data for image_name, data in zip(image_names, data_no_image_names)} 
 
 def convert_text_to_dict(text, fieldnames):
+    print(f"converting {text = }")
+    text = text.replace("*", "")
+    text = remove_extra_escape_chars(text)
+    print(f"new: {text = }")
     lines = striplines(text)
     result = {fieldname: "" for fieldname in fieldnames}
     for line in lines:
         for fieldname in fieldnames:
             if line.startswith(fieldname):
-                result[fieldname] = line.split(":", 1)[1].strip()
-    return result if any(result.values()) else {"error": text}        
+                result[fieldname] = line.split(":", 1)[1].strip()         
+    return clean_values(result) if any(result.values()) else convert_text_to_dict_backup(text, fieldnames)
+
+def convert_text_to_dict_backup(text, fieldnames):
+    print("backup called")
+    lines = striplines(text)
+    text = "".join(lines)
+    separated_parts = text.split(":")
+    result = {fieldname: "" for fieldname in fieldnames}
+    last_part_was_fieldname = False
+    last_fieldname = ""
+    for part in separated_parts:
+        if last_part_was_fieldname:
+            result[last_fieldname] = part.strip()
+            last_part_was_fieldname = False
+        elif part.strip() in fieldnames:
+            last_fieldname = part.strip()
+            last_part_was_fieldname = True
+    return clean_values(result) if any(result.values()) else {"error": text}        
 
 def text_to_transcriptions(text, prompt_text):
     fieldnames = get_fieldnames_from_prompt_text(prompt_text)

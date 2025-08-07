@@ -1,10 +1,11 @@
-from input_output_manager import InputOutputManager
+#from input_output_manager import InputOutputManager
+from testing.mock_input_output_manager import MockInputOutputManager
 from utilities.utils import get_fieldnames_from_prompt_text
 import time
 import re
 
 def get_scenario1(run_name, model, model_name, prompt_name, prompt_text, output_format, images_to_process, use_urls, chunk_size):
-    io_manager = InputOutputManager(run_name, model, model_name, prompt_name, prompt_text, output_format)
+    io_manager = MockInputOutputManager(run_name, model, model_name, prompt_name, prompt_text, output_format)
     fieldnames = get_fieldnames_from_prompt_text(prompt_text)
     run_numbering = io_manager.set_run_numbering(images_to_process=images_to_process, use_urls=True, chunk_size=chunk_size)
     return io_manager, fieldnames, run_numbering
@@ -29,6 +30,6 @@ def get_mock_setup():
     output_format = "CSV"
     images_to_process = get_urls_from_file("testing/mocks/mock_runs_url_files/5-bryophytes-typed-testing-urls.txt")
     use_urls = True
-    chunk_size = 1
+    chunk_size = 3
     io_manager, fieldnames, run_numbering = get_scenario1(run_name, model, model_name, prompt_name, prompt_text, output_format, images_to_process, use_urls, chunk_size)
     return io_manager, fieldnames, run_numbering
