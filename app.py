@@ -539,7 +539,7 @@ def process_single_image(image_info):
         if "error" in processing_data:
             raise Exception(processing_data["error"])
         transcription_data = ensure_data_is_json(content)
-        if isinstance(transcription_data, str):
+        if isinstance(transcription_data, str) or "error" in transcription_data:
             raise Exception(f"Error processing image {image_name}: {transcription_data}")
         else:
             image_info.set_transcription(transcription_data, st.session_state.io_manager.fieldnames)
