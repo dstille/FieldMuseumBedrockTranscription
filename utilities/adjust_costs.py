@@ -18,6 +18,7 @@ def load_json(filepath):
         return json.load(f)
 
 def get_model_and_family_name(model_id):
+    model_id = model_id["id"] if type(model_id) == dict else model_id
     family_name, model_name_long = model_id.split('.')
     # Remove version suffix (e.g., ':0') from model name
     model_name_clean = model_name_long.split(':')[0]
@@ -48,7 +49,14 @@ def main():
     for filename in os.listdir(DATA_DIR):
         if filename.endswith('.json'):
             filepath = os.path.join(DATA_DIR, filename)
-            data = load_json(filepath)
+            try:
+                data = load_json(filepath)
+                if not data:
+                    print(f"Skipping empty file: {filename}")
+                    continue
+            except json.JSONDecodeError:
+                print(f"Skipping invalid JSON file: {filename}")
+                continue        
             model_id = data['model']
             family_name, model_name = get_model_and_family_name(model_id)
             

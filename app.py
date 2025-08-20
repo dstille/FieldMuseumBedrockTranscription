@@ -147,9 +147,11 @@ def configure_inputs():
         st.subheader("3. Select Input Method")
         select_input_method()
         st.subheader("4. Name Output File")
+        print(f"1. {st.session_state.selected_local_images = }")
         if st.session_state.selected_model and (st.session_state.uploaded_file or st.session_state.selected_local_images):
             name_output_file()
         st.subheader("5. Select File Format for Saving")
+        print(f"2. {st.session_state.selected_local_images = }")
         if st.session_state.uploaded_file or st.session_state.selected_local_images:
             select_output_format()                                                                  
                                
@@ -719,12 +721,12 @@ def select_output_format():
     else:    
         chunk_size = st.slider("Adjust Number Transcriptions per Output File", 1, max_chunk_size, max_chunk_size)
         st.session_state.chunk_size = chunk_size
-        st.session_state.output_format = st.radio(
-            "Choose output format:",
-            ["CSV", "JSON", "TXT"],
-            help="CSV: Spreadsheet format\nJSON: Structured data format\nTEXT: a single plain text file",
-            index=0
-        )    
+    st.session_state.output_format = st.radio(
+        "Choose output format:",
+        ["CSV", "JSON", "TXT"],
+        help="CSV: Spreadsheet format\nJSON: Structured data format\nTEXT: a single plain text file",
+        index=0
+    )    
 
 def select_prompt():
     prompts = load_prompts()
